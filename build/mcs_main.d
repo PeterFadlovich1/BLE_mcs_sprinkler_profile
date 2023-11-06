@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/mcs_main.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/mcs_main.o: \
  profiles/mcs/mcs_main.c \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdbool.h \
  profiles/mcs/mcs_api.h \
@@ -64,4 +64,4 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/mcs_main.o: \
  C:/MaximSDK/Libraries/MiscDrivers/PushButton/pb.h \
  C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_ui.h \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_led.h \
- C:/MaximSDK/Libraries/Cordio/platform/include/pal_types.h
+ C:/MaximSDK/Libraries/Cordio/platform/include/pal_types.h BLE_handlers.h

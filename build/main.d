@@ -1,5 +1,5 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/main.o: main.c \
- c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\string.h \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/main.o: \
+ main.c c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\string.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\_ansi.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\newlib.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\_newlib_version.h \
@@ -65,6 +65,7 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/main.o: main.c \
  C:/MaximSDK/Libraries/Cordio/wsf/include/ll_defs.h \
  C:/MaximSDK/Libraries/Cordio/wsf/include/wsf_queue.h \
  C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_terminal.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_delay.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/ble/ll_init_api.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/common/bb_api.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/common/cfg_mac.h \
@@ -72,4 +73,26 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/main.o: main.c \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_types.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/ble/ll_api.h \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_cfg.h mcs_app_api.h \
- C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_ui.h
+ C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_ui.h \
+ profiles/mcs/mcs_api.h services/svc_mcs.h \
+ C:/MaximSDK/Libraries/Cordio/wsf/include/util/bstream.h \
+ C:/MaximSDK/Libraries/Cordio/ble-profiles/sources/services/svc_cfg.h \
+ C:/MaximSDK/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include/board.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdio.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\types.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\machine\endian.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\machine\_endian.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\select.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\_sigset.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\_timeval.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\timespec.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\_timespec.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\_pthreadtypes.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\sched.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\machine\types.h \
+ c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\stdio.h \
+ C:/MaximSDK/Libraries/MiscDrivers/LED/led.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_assert.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/gpio.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/gpio_regs.h \
+ C:/MaximSDK/Libraries/MiscDrivers/PushButton/pb.h BLE_handlers.h

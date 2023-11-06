@@ -46,6 +46,7 @@ connection requests.
 #include "app_api.h"
 #include "hci_core.h"
 #include "app_terminal.h"
+#include "mxc_delay.h"
 
 #if defined(HCI_TR_EXACTLE) && (HCI_TR_EXACTLE == 1)
 #include "ll_init_api.h"
@@ -56,6 +57,8 @@ connection requests.
 
 #include "mcs_app_api.h"
 #include "app_ui.h"
+#include "mcs_api.h"
+#include "BLE_handlers.h"
 
 /**************************************************************************************************
   Macros
@@ -75,6 +78,14 @@ static wsfBufPoolDesc_t mainPoolDesc[] = { { 16, 8 }, { 32, 4 }, { 192, 8 }, { 2
 #if defined(HCI_TR_EXACTLE) && (HCI_TR_EXACTLE == 1)
 static LlRtCfg_t mainLlRtCfg;
 #endif
+
+//BLE global variable initializations 
+int manualOff = 0;
+int manualOn = 0;
+int manualTime = 0;
+int rootDepth = 0;
+int scheduleTimeArray[8] = { 0, 0, 0, 0, 0, 0, 0, 0};
+
 
 /**************************************************************************************************
   Functions
@@ -210,6 +221,39 @@ int main(void)
 
     StackInitMcsApp();
     McsAppStart();
+    
+    while (TRUE)
+    {
+        printf("testing!\n");
+        //MXC_Delay(100000);
+        WsfTimerSleepUpdate();
+        //MXC_Delay(100000);
+        wsfOsDispatcher();
+        //MXC_Delay(100000);
+        if (!WsfOsActive())
+        {
+
+        WsfTimerSleep();
+
+        }
+
+    }
+    while (TRUE)
+    {
+        printf("testing!\n");
+        MXC_Delay(100000);
+        WsfTimerSleepUpdate();
+        MXC_Delay(100000);
+        wsfOsDispatcher();
+        MXC_Delay(100000);
+        if (!WsfOsActive())
+        {
+
+        WsfTimerSleep();
+
+        }
+
+    }
 
     WsfOsEnterMainLoop();
 
