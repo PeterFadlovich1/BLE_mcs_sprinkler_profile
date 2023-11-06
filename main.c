@@ -224,7 +224,6 @@ int main(void)
     
     while (TRUE)
     {
-        printf("testing!\n");
         //MXC_Delay(100000);
         WsfTimerSleepUpdate();
         //MXC_Delay(100000);

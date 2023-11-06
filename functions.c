@@ -1,4 +1,5 @@
 #define CAP_CYCLES 5
+#if 0
 #define ADC_SOIL_1 3
 #define ADC_SOIL_2 4
 #define ADC_RAIN 6
@@ -167,7 +168,6 @@ void ContinuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
     4. Set polarity, timer parameters
     5. Enable Timer
     */
-
     MXC_TMR_Shutdown(timer);
 
     tmr.pres = prescalar;
@@ -184,3 +184,4 @@ void ContinuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
 
     printf("Continuous timer started.\n\n");
 }
+#endif

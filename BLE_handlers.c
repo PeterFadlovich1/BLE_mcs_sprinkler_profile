@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "app_ui.h"
 #include "mcs_api.h"
+#include "tmr.h"
 #define MANUAL_TIMER MXC_TMR0
 
 
