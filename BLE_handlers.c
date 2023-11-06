@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "app_ui.h"
 #include "mcs_api.h"
+#define MANUAL_TIMER MXC_TMR0
 
 
 extern int manualOff;
@@ -14,12 +15,15 @@ void manualOffHandler(uint16_t handle)
 {
     //if (currentState = )
     manualOff = 1;
+    manualOn = 0;
     manualTime = 1;
     printf("manual Off = 1: %u", manualOff);
     printf("\n");
     fflush(stdout);
 
     AttsSetAttr(handle, 1, 0);
+    MXC_TMR_Shutdown(MANUAL_TIMER);
+    MXC_TMR_Start(MANUAL_TIMER);
 
     //MXC_delay(3000000);
 }
@@ -28,12 +32,16 @@ void manualOnHandler(uint16_t handle)
 {
     //if (currentState = )
     manualOn = 1;
+    manualOff = 0;
     manualTime = 1;
     printf("manual On = 1: %u", manualOn);
     printf("\n");
     fflush(stdout);
 
     AttsSetAttr(handle, 1, 0);
+    MXC_TMR_Shutdown(MANUAL_TIMER);
+    MXC_TMR_Start(MANUAL_TIMER);
+
 
     //MXC_delay(3000000);
 }
