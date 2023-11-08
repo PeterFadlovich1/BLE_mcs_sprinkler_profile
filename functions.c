@@ -195,6 +195,7 @@ void bluetoothInterruptHandler(){
 }
 
 void bluetoothInterruptInit(){
+    MXC_TMR_ClearFlags(BLE_TIMER);
     MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
     NVIC_EnableIRQ(BLE_TIMER);
     continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
