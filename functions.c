@@ -1,5 +1,4 @@
 #define CAP_CYCLES 5
-#if 0
 #define ADC_SOIL_1 3
 #define ADC_SOIL_2 4
 #define ADC_RAIN 6
@@ -8,6 +7,7 @@
 #define SOLENOID_ON 1
 #define SOLENOID_OFF 0
 #define MANUAL_TIMER MXC_TMR0
+#define BLE_TIMER MXC_TMR1
 //#include "ADC_lib.h"
 #include "tmr.h"
 #include "mxc_delay.h"
@@ -89,7 +89,7 @@ int chargeBattery(){
     setSolenoid(SOLENOID_OFF);
     return 0;
 }
-void ManualTimerHandler(void)
+void manualTimerHandler(void)
 {
     // Clear interrupt
     MXC_TMR_ClearFlags(MANUAL_TIMER);
@@ -99,14 +99,14 @@ void ManualTimerHandler(void)
 
 }
 
-void RainCompleteTimerHandler(void){
+void rainCompleteTimerHandler(void){
 
 }
 
-void MoistureCompleteTimerHandler(void){
+void moistureCompleteTimerHandler(void){
 
 }
-void OneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar)
+void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar)
 {
     // Declare variables
     mxc_tmr_cfg_t tmr;
@@ -150,12 +150,12 @@ void OneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
 }
 
 void manualInterruptInit(){
-    MXC_NVIC_SetVector(MANUAL_TIMER, ManualTimerHandler);
+    MXC_NVIC_SetVector(MANUAL_TIMER, manualTimerHandler);
     NVIC_EnableIRQ(MANUAL_TIMER);
-    OneshotTimerInit(MANUAL_TIMER, 14400,TMR_PRES_4096);
+    oneshotTimerInit(MANUAL_TIMER, 14400,TMR_PRES_4096);
 }
 
-void ContinuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar)
+void continuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar, int enable)
 {
     // Declare variables
     mxc_tmr_cfg_t tmr;
@@ -177,11 +177,26 @@ void ContinuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
     tmr.cmp_cnt =ticks; //SystemCoreClock*(1/interval_time);
     tmr.pol = 0;
 
-    if (MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
+    if (enable == TRUE && MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
         printf("Failed Continuous timer Initialization.\n");
         return;
     }
-
-    printf("Continuous timer started.\n\n");
 }
-#endif
+
+void bluetoothInterruptHandler(){
+    WsfTimerSleepUpdate();
+    wsfOsDispatcher();
+    if (!WsfOsActive())
+    {
+
+        WsfTimerSleep();
+
+    }
+}
+
+void bluetoothInterruptInit(){
+    MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
+    NVIC_EnableIRQ(BLE_TIMER);
+    continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
+}
+
