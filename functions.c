@@ -11,7 +11,23 @@
 //#include "ADC_lib.h"
 #include "tmr.h"
 #include "mxc_delay.h"
-int batteryLow, manualOn, scheduledTimeOn, manualOff, raining, highMoisture, lowMoisture, scheduledTimeOff, manualTime;
+#include "adc.h"
+#include "stdio.h"
+int batteryLow, manualOn, scheduledTimeOn, manualOff, raining, highMoisture, lowMoisture, scheduledTimeOff, manualTime, adc_done, adc_val;
+
+void adc_complete_cb(void *req, int adcRead)
+{
+    adc_val = adcRead;
+    adc_done = 1;
+    return;
+}
+void ADC_IRQHandler(void)
+{
+    MXC_ADC_Handler();
+    printf("%d\n", adc_done);
+    fflush(stdout);
+    adc_done = 0;
+}
 
 int onLoop(){
     while(1){
@@ -150,8 +166,8 @@ void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
 }
 
 void manualInterruptInit(){
-    MXC_NVIC_SetVector(MANUAL_TIMER, manualTimerHandler);
-    NVIC_EnableIRQ(MANUAL_TIMER);
+    MXC_NVIC_SetVector(TMR0_IRQn, manualTimerHandler);
+    NVIC_EnableIRQ(TMR0_IRQn);
     oneshotTimerInit(MANUAL_TIMER, 14400,TMR_PRES_4096);
 }
 
@@ -184,6 +200,7 @@ void continuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
 }
 
 void bluetoothInterruptHandler(){
+    MXC_TMR_ClearFlags(BLE_TIMER);
     WsfTimerSleepUpdate();
     wsfOsDispatcher();
     if (!WsfOsActive())
@@ -195,9 +212,20 @@ void bluetoothInterruptHandler(){
 }
 
 void bluetoothInterruptInit(){
-    MXC_TMR_ClearFlags(BLE_TIMER);
-    MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
-    NVIC_EnableIRQ(BLE_TIMER);
+    MXC_NVIC_SetVector(TMR1_IRQn, bluetoothInterruptHandler);
+    NVIC_EnableIRQ(TMR1_IRQn);
     continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
 }
 
+void initADC(mxc_adc_monitor_t monitor, mxc_adc_chsel_t chan, uint16_t hithresh){
+    if (MXC_ADC_Init() != E_NO_ERROR) {
+        printf("Error Bad Parameter\n");
+
+    }
+
+    /* Set up LIMIT0 to monitor high and low trip points */
+    MXC_ADC_SetMonitorChannel(monitor, chan);
+    MXC_ADC_SetMonitorHighThreshold(monitor, hithresh);
+    MXC_ADC_SetMonitorLowThreshold(monitor, 0);
+    MXC_ADC_EnableMonitor(monitor);
+}
