@@ -8,6 +8,11 @@
 #define SOLENOID_OFF 0
 #define MANUAL_TIMER MXC_TMR0
 #define BLE_TIMER MXC_TMR1
+#define TAKE_SAMPLE_TIMER MXC_TMR2
+#define SAMPLE_PERIOD_TIMER MXC_TMR3
+#define MOISTURE_READ_1 MXC_ADC_CH_0
+#define MOISTURE_READ_2 MXC_ADC_CH_1
+#define RAIN_READ MXC_ADC_CH_2
 //#include "ADC_lib.h"
 #include "tmr.h"
 #include "mxc_delay.h"
@@ -38,7 +43,7 @@ void rain_cb(void *req, int adcRead){
 void rainTimerHandler(){
     /*code here will be based of off characterization*/
     raining = rainPeaks > 3 ? TRUE : FALSE;
-    MXC_TMR_Stop(MXC_TMR3);
+    MXC_TMR_Stop(SAMPLE_PERIOD_TIMER);
     return;
 }
 
@@ -48,16 +53,16 @@ void moistureTimerHandler(){
     moistureAvg2 = moistureAvg2/moistureCount;
     highMoisture = moistureAvg1 < 0x0ff;
     lowMoisture = moistureAvg2 > 0x2ff;
-    MXC_TMR_Stop(MXC_TMR3);
+    MXC_TMR_Stop(SAMPLE_PERIOD_TIMER);
     return;
 }
 
 void moistureStartMeasurement(){
-    MXC_ADC_StartConversionAsync(MXC_ADC_CH_0, moisture_cb1);
-    MXC_ADC_StartConversionAsync(MXC_ADC_CH_1, moisture_cb2);
+    MXC_ADC_StartConversionAsync(MOISTURE_READ_1, moisture_cb1);
+    MXC_ADC_StartConversionAsync(MOISTURE_READ_2, moisture_cb2);
 }
 void rainStartMeasurement(){
-    MXC_ADC_StartConversionAsync(MXC_ADC_CH_2, rain_cb);
+    MXC_ADC_StartConversionAsync(RAIN_READ, rain_cb);
 }
 
 void ADC_IRQHandler(void)
@@ -269,27 +274,27 @@ void initADC(mxc_adc_monitor_t monitor, mxc_adc_chsel_t chan, uint16_t hithresh)
 }
 
 void initMoistureRainSystem(){
-    initADC(MXC_ADC_MONITOR_0, MXC_ADC_CH_0, 0x1ff);
-    initADC(MXC_ADC_MONITOR_1, MXC_ADC_CH_1, 0x1ff);
-    initADC(MXC_ADC_MONITOR_2, MXC_ADC_CH_2, 0x1ff);
+    initADC(MXC_ADC_MONITOR_0, MOISTURE_READ_1, 0x1ff);
+    initADC(MXC_ADC_MONITOR_1, MOISTURE_READ_2, 0x1ff);
+    initADC(MXC_ADC_MONITOR_2, RAIN_READ, 0x1ff);
     MXC_NVIC_SetVector(TMR2_IRQn, moistureTimerHandler);
     NVIC_EnableIRQ(TMR2_IRQn);
     NVIC_EnableIRQ(TMR3_IRQn);
-    oneshotTimerInit(MXC_TMR2, 480, TMR_PRES_4096);
-    continuousTimerInit(MXC_TMR3, 100, TMR_PRES_4096, FALSE);
+    oneshotTimerInit(TAKE_SAMPLE_TIMER, 480, TMR_PRES_4096);
+    continuousTimerInit(SAMPLE_PERIOD_TIMER, 100, TMR_PRES_4096, FALSE);
 }
 
 void startMoitureSystem(){
-    MXC_TMR_Start(MXC_TMR2);
-    MXC_TMR_Start(MXC_TMR3);
+    MXC_TMR_Start(TAKE_SAMPLE_TIMER);
+    MXC_TMR_Start(SAMPLE_PERIOD_TIMER);
     MXC_NVIC_SetVector(TMR2_IRQn, moistureTimerHandler);
     MXC_NVIC_SetVector(TMR3_IRQn, moistureStartMeasurement);
 
 }
 
 void startRainSystem(){
-    MXC_TMR_Start(MXC_TMR2);
-    MXC_TMR_Start(MXC_TMR3);
+    MXC_TMR_Start(TAKE_SAMPLE_TIMER);
+    MXC_TMR_Start(SAMPLE_PERIOD_TIMER);
     MXC_NVIC_SetVector(TMR2_IRQn, rainTimerHandler);
     MXC_NVIC_SetVector(TMR3_IRQn, rainStartMeasurement);
 }
