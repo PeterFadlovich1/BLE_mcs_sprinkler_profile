@@ -98,7 +98,8 @@
     "files.associations": {
         "mcs_api.h": "c",
         "svc_mcs.h": "c",
-        "mcs_app_api.h": "c"
+        "mcs_app_api.h": "c",
+        "cstdio": "c"
     }
 }
 

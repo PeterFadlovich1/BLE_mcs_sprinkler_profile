@@ -1,4 +1,3 @@
-#if 0
 
 #define CAP_CYCLES 5
 #define ADC_SOIL_1 3
@@ -10,10 +9,67 @@
 #define SOLENOID_OFF 0
 #define MANUAL_TIMER MXC_TMR0
 #define BLE_TIMER MXC_TMR1
+#define TAKE_SAMPLE_TIMER MXC_TMR2
+#define SAMPLE_PERIOD_TIMER MXC_TMR3
+#define MOISTURE_READ_1 MXC_ADC_CH_0
+#define MOISTURE_READ_2 MXC_ADC_CH_1
+#define RAIN_READ MXC_ADC_CH_2
 //#include "ADC_lib.h"
 #include "tmr.h"
 #include "mxc_delay.h"
+#include "adc.h"
+#include "stdio.h"
 int batteryLow, manualOn, scheduledTimeOn, manualOff, raining, highMoisture, lowMoisture, scheduledTimeOff, manualTime;
+int moistureAvg1, moistureAvg2, moistureCount, rainPeaks, rainCount;
+
+void moisture_cb1(void *req, int adcRead){
+    moistureCount++;
+    moistureAvg1+=adcRead;
+    return;
+}
+
+void moisture_cb2(void *req, int adcRead){
+    moistureAvg2+=adcRead;
+    return;
+}
+
+void rain_cb(void *req, int adcRead){
+    rainCount++;
+    if (adcRead < RAIN_VOLTAGE_THRESHOLD){
+        rainPeaks++;
+    }
+    return;
+}
+
+void rainTimerHandler(){
+    /*code here will be based of off characterization*/
+    raining = rainPeaks > 3 ? TRUE : FALSE;
+    MXC_TMR_Stop(SAMPLE_PERIOD_TIMER);
+    return;
+}
+
+void moistureTimerHandler(){
+    /*code here will be based off of characterization and rootdepth*/
+    moistureAvg1 = moistureAvg1/moistureCount;
+    moistureAvg2 = moistureAvg2/moistureCount;
+    highMoisture = moistureAvg1 < 0x0ff;
+    lowMoisture = moistureAvg2 > 0x2ff;
+    MXC_TMR_Stop(SAMPLE_PERIOD_TIMER);
+    return;
+}
+
+void moistureStartMeasurement(){
+    MXC_ADC_StartConversionAsync(MOISTURE_READ_1, moisture_cb1);
+    MXC_ADC_StartConversionAsync(MOISTURE_READ_2, moisture_cb2);
+}
+void rainStartMeasurement(){
+    MXC_ADC_StartConversionAsync(RAIN_READ, rain_cb);
+}
+
+void ADC_IRQHandler(void)
+{
+    MXC_ADC_Handler();
+}
 
 int onLoop(){
     while(1){
@@ -145,16 +201,14 @@ void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
     // Enable Timer wake-up source
     MXC_TMR_EnableWakeup(timer, &tmr);
 
-            OneshotTimer();
-
     printf("Oneshot timer started.\n\n");
 
     //MXC_TMR_Start(OST_TIMER);
 }
 
 void manualInterruptInit(){
-    MXC_NVIC_SetVector(MANUAL_TIMER, manualTimerHandler);
-    NVIC_EnableIRQ(MANUAL_TIMER);
+    MXC_NVIC_SetVector(TMR0_IRQn, manualTimerHandler);
+    NVIC_EnableIRQ(TMR0_IRQn);
     oneshotTimerInit(MANUAL_TIMER, 14400,TMR_PRES_4096);
 }
 
@@ -180,13 +234,18 @@ void continuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
     tmr.cmp_cnt =ticks; //SystemCoreClock*(1/interval_time);
     tmr.pol = 0;
 
-    if (enable == TRUE && MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
+    if (MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
         printf("Failed Continuous timer Initialization.\n");
         return;
     }
+    if (!enable){
+        MXC_TMR_Stop(timer);
+    }
+    return;
 }
 
 void bluetoothInterruptHandler(){
+    MXC_TMR_ClearFlags(BLE_TIMER);
     WsfTimerSleepUpdate();
     wsfOsDispatcher();
     if (!WsfOsActive())
@@ -199,8 +258,15 @@ void bluetoothInterruptHandler(){
 
 void bluetoothInterruptInit(){
     MXC_TMR_ClearFlags(BLE_TIMER);
-    MXC_NVIC_SetVector(TMR1_IRQn, bluetoothInterruptHandler);
-    NVIC_EnableIRQ(TMR1_IRQn);
+    MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
+    NVIC_EnableIRQ(BLE_TIMER);
     continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
 }
-#endif
+
+
+void startRainSystem(){
+    MXC_TMR_Start(TAKE_SAMPLE_TIMER);
+    MXC_TMR_Start(SAMPLE_PERIOD_TIMER);
+    MXC_NVIC_SetVector(TMR2_IRQn, rainTimerHandler);
+    MXC_NVIC_SetVector(TMR3_IRQn, rainStartMeasurement);
+}
