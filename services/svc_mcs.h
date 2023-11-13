@@ -50,6 +50,14 @@ extern "C" {
     0xBE, 0xC5, 0xD1, 0x24, 0x99, 0x33, 0xC6, 0x87, 0x85, 0x41, 0xD9, 0x31, 0x81, 0x56, 0xFC, 0x85
 #define ATT_UUID_MCS_X \
     0xBE, 0xC5, 0xD1, 0x24, 0x99, 0x33, 0xC6, 0x87, 0x85, 0x41, 0xD9, 0x31, 0x82, 0x56, 0xFC, 0x85
+#define ATT_UUID_MCS_CANCEL_TIMER \
+    0xBE, 0xC5, 0xD1, 0x24, 0x99, 0x33, 0xC6, 0x87, 0x85, 0x41, 0xD9, 0x31, 0x83, 0x56, 0xFC, 0x85
+#define ATT_UUID_MCS_ON_RAIN \
+    0xBE, 0xC5, 0xD1, 0x24, 0x99, 0x33, 0xC6, 0x87, 0x85, 0x41, 0xD9, 0x31, 0x84, 0x56, 0xFC, 0x85
+#if 0
+#define ATT_UUID_MCS_ON_CAP \
+    0xBE, 0xC5, 0xD1, 0x24, 0x99, 0x33, 0xC6, 0x87, 0x85, 0x41, 0xD9, 0x31, 0x85, 0x56, 0xFC, 0x85
+#endif
 
 /**************************************************************************************************
  Handle Ranges
@@ -72,14 +80,20 @@ enum {
     MCS_BUTTON_CH_HDL, /*!< \brief Button characteristic */
     MCS_BUTTON_HDL, /*!< \brief Button*/
     MCS_BUTTON_CH_CCC_HDL, /*!< \brief Button CCCD*/
-    MCS_ON_CH_HDL, /*!< \brief R characteristic */
-    MCS_ON_HDL, /*!< \brief R*/
-    MCS_OFF_CH_HDL, /*!< \brief G characteristic */
-    MCS_OFF_HDL, /*!< \brief G*/
+    MCS_ON_OFF_CH_HDL, /*!< \brief R characteristic */
+    MCS_ON_OFF_HDL, /*!< \brief R*/
+    MCS_SENSOR_CH_HDL, /*!< \brief G characteristic */
+    MCS_SENSOR_HDL, /*!< \brief G*/
     MCS_ROOT_CH_HDL, /*!< \brief B characteristic */
     MCS_ROOT_HDL, /*!< \brief B*/
     MCS_SCHEDULE_CH_HDL, /*!< \brief B characteristic */
     MCS_SCHEDULE_HDL, /*!< \brief B*/
+    MCS_CANCEL_TIMER_CH_HDL,
+    MCS_CANCEL_TIMER_HDL,
+    MCS_ON_RAIN_CH_HDL,
+    MCS_ON_RAIN_HDL, 
+    //MCS_ON_CAP_CH_HDL,
+    //MCS_ON_CAP_HDL,  
     MCS_MAX_HDL /*!< \brief Maximum handle. */
 };
 /**@}*/

@@ -1,3 +1,4 @@
+
 #define CAP_CYCLES 5
 #define ADC_SOIL_1 3
 #define ADC_SOIL_2 4
@@ -146,6 +147,7 @@ int chargeBattery(){
     setSolenoid(SOLENOID_OFF);
     return 0;
 }
+
 void manualTimerHandler(void)
 {
     // Clear interrupt
@@ -255,42 +257,12 @@ void bluetoothInterruptHandler(){
 }
 
 void bluetoothInterruptInit(){
-    MXC_NVIC_SetVector(TMR1_IRQn, bluetoothInterruptHandler);
-    NVIC_EnableIRQ(TMR1_IRQn);
+    MXC_TMR_ClearFlags(BLE_TIMER);
+    MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
+    NVIC_EnableIRQ(BLE_TIMER);
     continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
 }
 
-void initADC(mxc_adc_monitor_t monitor, mxc_adc_chsel_t chan, uint16_t hithresh){
-    if (MXC_ADC_Init() != E_NO_ERROR) {
-        printf("Error Bad Parameter\n");
-
-    }
-
-    /* Set up LIMIT0 to monitor high and low trip points */
-    MXC_ADC_SetMonitorChannel(monitor, chan);
-    MXC_ADC_SetMonitorHighThreshold(monitor, hithresh);
-    MXC_ADC_SetMonitorLowThreshold(monitor, 0);
-    MXC_ADC_EnableMonitor(monitor);
-}
-
-void initMoistureRainSystem(){
-    initADC(MXC_ADC_MONITOR_0, MOISTURE_READ_1, 0x1ff);
-    initADC(MXC_ADC_MONITOR_1, MOISTURE_READ_2, 0x1ff);
-    initADC(MXC_ADC_MONITOR_2, RAIN_READ, 0x1ff);
-    MXC_NVIC_SetVector(TMR2_IRQn, moistureTimerHandler);
-    NVIC_EnableIRQ(TMR2_IRQn);
-    NVIC_EnableIRQ(TMR3_IRQn);
-    oneshotTimerInit(TAKE_SAMPLE_TIMER, 480, TMR_PRES_4096);
-    continuousTimerInit(SAMPLE_PERIOD_TIMER, 100, TMR_PRES_4096, FALSE);
-}
-
-void startMoitureSystem(){
-    MXC_TMR_Start(TAKE_SAMPLE_TIMER);
-    MXC_TMR_Start(SAMPLE_PERIOD_TIMER);
-    MXC_NVIC_SetVector(TMR2_IRQn, moistureTimerHandler);
-    MXC_NVIC_SetVector(TMR3_IRQn, moistureStartMeasurement);
-
-}
 
 void startRainSystem(){
     MXC_TMR_Start(TAKE_SAMPLE_TIMER);

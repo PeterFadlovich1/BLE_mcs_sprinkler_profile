@@ -3,7 +3,7 @@
 #include "app_ui.h"
 #include "mcs_api.h"
 #include "tmr.h"
-#define MANUAL_TIMER MXC_TMR0
+#define MANUAL_TIMER MXC_TMR4
 
 
 extern int manualOff;
@@ -11,40 +11,58 @@ extern int manualOn;
 extern int manualTime;
 extern int rootDepth;
 extern int scheduleTimeArray[8];
+extern int rainOn;
+extern int capOn;
 
-void manualOffHandler(uint16_t handle)
+void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 {
-    //if (currentState = )
-    manualOff = 1;
-    manualOn = 0;
-    manualTime = 1;
-    printf("manual Off = 1: %u", manualOff);
-    printf("\n");
+    printf("sent value: %u \n", *pValue);
     fflush(stdout);
 
+    switch(*pValue){
+        case 1: //Manual ON
+        
+            manualOn = 1;
+            manualOff = 0;
+            manualTime = 1;
+            //MXC_TMR_Shutdown(MANUAL_TIMER);
+            MXC_TMR_Start(MANUAL_TIMER);
+
+            printf("Manual On \n");
+            fflush(stdout);
+
+            break;
+        case 2:  //Manual Off
+
+            manualOn = 0;
+            manualOff = 1;
+            manualTime = 1;
+            //MXC_TMR_Shutdown(MANUAL_TIMER);
+            MXC_TMR_Start(MANUAL_TIMER);
+
+            printf("Manual Off \n");
+            fflush(stdout);
+
+            break;
+        case 3:  //Cancel Timer
+            manualOn = 0;
+            manualOff = 0;
+            manualTime = 0;
+            MXC_TMR_Stop(MANUAL_TIMER);
+            MXC_TMR_SetCount(MANUAL_TIMER,0);
+            MXC_TMR_ClearFlags(MANUAL_TIMER);
+
+            printf("Cancel Timer \n");
+            fflush(stdout);
+
+            break;
+    }
+    //printf("manual Off = 1: %u", manualOff);
+    //printf("\n");
+    //fflush(stdout);
+
     AttsSetAttr(handle, 1, 0);
-    MXC_TMR_Shutdown(MANUAL_TIMER);
-    MXC_TMR_Start(MANUAL_TIMER);
 
-    //MXC_delay(3000000);
-}
-
-void manualOnHandler(uint16_t handle)
-{
-    //if (currentState = )
-    manualOn = 1;
-    manualOff = 0;
-    manualTime = 1;
-    printf("manual On = 1: %u", manualOn);
-    printf("\n");
-    fflush(stdout);
-
-    AttsSetAttr(handle, 1, 0);
-    MXC_TMR_Shutdown(MANUAL_TIMER);
-    MXC_TMR_Start(MANUAL_TIMER);
-
-
-    //MXC_delay(3000000);
 }
 
 void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
@@ -64,4 +82,21 @@ void rootDepthHandler( uint8_t *pValue)
     printf("root depth: %u", rootDepth);
     printf("\n");
     fflush(stdout);
+}
+
+void onSensorSet( uint8_t *pValue){
+
+    switch(*pValue){
+        case 1: //rain on
+        rainOn = 1;
+        printf("rainOn: %u \n", rainOn);
+        fflush(stdout);
+        break;
+
+        case 2: //cap On
+        capOn = 1;
+        printf("capOn: %u \n", capOn);
+        fflush(stdout);
+        break;
+    }
 }

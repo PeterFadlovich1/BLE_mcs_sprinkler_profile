@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/PeterBluetoothtest/BLE_mcs_sprinkler_profile/build/BLE_handlers.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/BLE_handlers.o: \
  BLE_handlers.c \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdbool.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdio.h \

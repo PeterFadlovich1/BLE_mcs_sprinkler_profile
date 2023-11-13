@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/stack_mcs_app.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/stack_mcs_app.o: \
  stack_mcs_app.c C:/MaximSDK/Libraries/Cordio/wsf/include/wsf_types.h \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdint.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdint.h \

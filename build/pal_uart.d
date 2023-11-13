@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/pal_uart.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/pal_uart.o: \
  C:/MaximSDK/Libraries/Cordio/platform/targets/maxim/max32655/sources/pal_uart.c \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_uart.h \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_types.h \

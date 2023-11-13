@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/heap.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/heap.o: \
  C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Source/heap.c \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdint.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdint.h \

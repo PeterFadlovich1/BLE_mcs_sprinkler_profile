@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/pal_sys.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/pal_sys.o: \
  C:/MaximSDK/Libraries/Cordio/platform/targets/maxim/max32655/sources/pal_sys.c \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\string.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\_ansi.h \

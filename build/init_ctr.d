@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/init_ctr.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/init_ctr.o: \
  C:/MaximSDK/Libraries/Cordio/controller/sources/ble/init/init_ctr.c \
  C:/MaximSDK/Libraries/Cordio/controller/include/ble/ll_init_api.h \
  C:/MaximSDK/Libraries/Cordio/wsf/include/wsf_types.h \
