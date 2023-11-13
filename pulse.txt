@@ -1,0 +1,247 @@
+/**
+ * @file        main.c
+ * @brief       GPIO Example
+ * @details
+ */
+
+/******************************************************************************
+ * Copyright (C) 2023 Maxim Integrated Products, Inc., All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
+ * OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Except as contained in this notice, the name of Maxim Integrated
+ * Products, Inc. shall not be used except as stated in the Maxim Integrated
+ * Products, Inc. Branding Policy.
+ *
+ * The mere transfer of this software does not imply any licenses
+ * of trade secrets, proprietary technology, copyrights, patents,
+ * trademarks, maskwork rights, or any other form of intellectual
+ * property whatsoever. Maxim Integrated Products, Inc. retains all
+ * ownership rights.
+ *
+ ******************************************************************************/
+
+/***** Includes *****/
+#include <stdio.h>
+#include <string.h>
+#include "mxc_device.h"
+#include "nvic_table.h"
+#include "pb.h"
+#include "board.h"
+#include "gpio.h"
+#include "tmr.h"
+#include "lp.h"
+
+/***** Definitions *****/
+#define OST_CLOCK_SOURCE MXC_TMR_32K_CLK // \ref mxc_tmr_clock_t
+#define PWM_CLOCK_SOURCE MXC_TMR_APB_CLK // \ref mxc_tmr_clock_t
+#define CONT_CLOCK_SOURCE MXC_TMR_8M_CLK // \ref mxc_tmr_clock_t
+
+// Parameters for Continuous timer
+#define OST_FREQ 20 // (Hz)
+#define OST_TIMER1 MXC_TMR4 // Can be MXC_TMR0 through MXC_TMR5
+#define OST_TIMER2 MXC_TMR5
+#define BOARD_FTHR_APPS_P1
+#if defined(BOARD_FTHR_APPS_P1)
+#define MXC_GPIO_PORT_IN MXC_GPIO0
+#define MXC_GPIO_PIN_IN MXC_GPIO_PIN_2
+
+//#define MXC_GPIO_PORT_OUT MXC_GPIO0
+//#define MXC_GPIO_PIN_OUT MXC_GPIO_PIN_20//30
+
+#define MXC_GPIO_PORT_INTERRUPT_IN1 MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_IN1 MXC_GPIO_PIN_3
+
+#define MXC_GPIO_PORT_INTERRUPT_IN2 MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_IN2 MXC_GPIO_PIN_2
+
+#define MXC_GPIO_PORT_INTERRUPT_STATUS1 MXC_GPIO2
+#define MXC_GPIO_PIN_INTERRUPT_STATUS1 MXC_GPIO_PIN_4//31
+#define MXC_GPIO_PORT_INTERRUPT_STATUS2 MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_STATUS2 MXC_GPIO_PIN_5//30
+
+#define BUTTON1_Pin 2
+#define BUTTON2_Pin 3
+#define LED1_Pin 20//30
+#define LED2_Pin 24//31
+#else
+#define MXC_GPIO_PORT_IN MXC_GPIO0
+#define MXC_GPIO_PIN_IN MXC_GPIO_PIN_18
+
+#define MXC_GPIO_PORT_OUT MXC_GPIO0
+#define MXC_GPIO_PIN_OUT MXC_GPIO_PIN_24
+
+#define MXC_GPIO_PORT_INTERRUPT_IN MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_IN MXC_GPIO_PIN_19
+
+#define MXC_GPIO_PORT_INTERRUPT_STATUS MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_STATUS MXC_GPIO_PIN_25
+
+#define BUTTON1_Pin 18
+#define BUTTON2_Pin 19
+#define LED1_Pin 24
+#define LED2_Pin 25
+#endif
+
+/***** Globals *****/
+uint16_t pin = 0;
+/***** Functions *****/
+void gpio_isr1(void *cbdata)
+{
+    mxc_gpio_cfg_t *cfg = cbdata;
+    MXC_GPIO_OutToggle(cfg->port, cfg->mask);
+    MXC_TMR_Start(OST_TIMER1);
+    printf("turned back on1!\n");
+    pin = 1;
+}
+
+void gpio_isr2(void *cbdata)
+{
+    mxc_gpio_cfg_t *cfg = cbdata;
+    MXC_GPIO_OutToggle(cfg->port, cfg->mask);
+    MXC_TMR_Start(OST_TIMER1);
+    printf("turned back on2!\n");
+    pin = 2;
+}
+
+void OneshotTimerHandler(void)
+{
+    // Clear interrupt
+    MXC_TMR_ClearFlags(OST_TIMER1);
+
+    // Clear interrupt
+    if (MXC_TMR4->wkfl & MXC_F_TMR_WKFL_A) {
+        MXC_TMR4->wkfl = MXC_F_TMR_WKFL_A;
+        MXC_GPIO_OutToggle( pin == 1 ? MXC_GPIO_PORT_INTERRUPT_STATUS1 : MXC_GPIO_PORT_INTERRUPT_STATUS2,  pin == 1 ? MXC_GPIO_PIN_INTERRUPT_STATUS1 : MXC_GPIO_PIN_INTERRUPT_STATUS2);
+    }
+}
+
+void OneshotTimer(mxc_tmr_regs_t *timer)
+{
+    // Declare variables
+    mxc_tmr_cfg_t tmr;
+    uint32_t periodTicks = MXC_TMR_GetPeriod(timer, OST_CLOCK_SOURCE, 128, OST_FREQ);
+    mxc_tmr_cfg_t *test = &tmr;
+    /*
+    Steps for configuring a timer for PWM mode:
+    1. Disable the timer
+    2. Set the prescale value
+    3  Configure the timer for continuous mode
+    4. Set polarity, timer parameters
+    5. Enable Timer
+    */
+
+    MXC_TMR_Shutdown(timer);
+
+    tmr.pres = TMR_PRES_128;
+    tmr.mode = TMR_MODE_ONESHOT;
+    tmr.bitMode = TMR_BIT_MODE_32;
+    tmr.clock = OST_CLOCK_SOURCE;
+    tmr.cmp_cnt = periodTicks; //SystemCoreClock*(1/interval_time);
+    tmr.pol = 0;
+
+    if (MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
+        printf("Failed Continuous timer Initialization.\n");
+        return;
+    }
+
+    MXC_TMR_EnableInt(timer);
+
+    // Clear Wakeup status
+    MXC_LP_ClearWakeStatus();
+    // Enable wkup source in Poower seq register
+    MXC_LP_EnableTimerWakeup(timer);
+    // Enable Timer wake-up source
+    MXC_TMR_EnableWakeup(timer, &tmr);
+
+    MXC_TMR_Start(timer);
+}
+
+int main(void)
+{
+    mxc_gpio_cfg_t gpio_in;
+    mxc_gpio_cfg_t gpio_out;
+    mxc_gpio_cfg_t gpio_interrupt1;
+    mxc_gpio_cfg_t gpio_interrupt2;
+    mxc_gpio_cfg_t gpio_interrupt_status1;
+    mxc_gpio_cfg_t gpio_interrupt_status2;
+
+    printf("\n\n************************* GPIO Example ***********************\n\n");
+    printf("1. This example reads P0.%d and outputs the same state onto P0.%d.\n", BUTTON1_Pin,
+           LED1_Pin);
+    printf("2. An interrupt is set up on P0.%d. P0.%d toggles when that\n", BUTTON2_Pin, LED2_Pin);
+    printf("   interrupt occurs.\n\n");
+    MXC_NVIC_SetVector(TMR4_IRQn, OneshotTimerHandler);
+    NVIC_EnableIRQ(TMR4_IRQn);
+    OneshotTimer(OST_TIMER1);
+    /* Setup interrupt status pin as an output so we can toggle it on each interrupt. */
+    gpio_interrupt_status1.port = MXC_GPIO_PORT_INTERRUPT_STATUS1;
+    gpio_interrupt_status1.mask = MXC_GPIO_PIN_INTERRUPT_STATUS1;
+    gpio_interrupt_status1.pad = MXC_GPIO_PAD_NONE;
+    gpio_interrupt_status1.func = MXC_GPIO_FUNC_OUT;
+    gpio_interrupt_status1.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    MXC_GPIO_Config(&gpio_interrupt_status1);
+
+    gpio_interrupt_status2.port = MXC_GPIO_PORT_INTERRUPT_STATUS2;
+    gpio_interrupt_status2.mask = MXC_GPIO_PIN_INTERRUPT_STATUS2;
+    gpio_interrupt_status2.pad = MXC_GPIO_PAD_NONE;
+    gpio_interrupt_status2.func = MXC_GPIO_FUNC_OUT;
+    gpio_interrupt_status2.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    MXC_GPIO_Config(&gpio_interrupt_status2);
+
+
+    MXC_GPIO_OutClr( MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
+    
+    /*
+     *   Set up interrupt on P0.18.
+     *   Switch on EV kit is open when non-pressed, and grounded when pressed.  Use an internal pull-up so pin
+     *     reads high when button is not pressed.
+     */
+    gpio_interrupt1.port = MXC_GPIO_PORT_INTERRUPT_IN1;
+    gpio_interrupt1.mask = MXC_GPIO_PIN_INTERRUPT_IN1;
+    gpio_interrupt1.pad = MXC_GPIO_PAD_PULL_UP;
+    gpio_interrupt1.func = MXC_GPIO_FUNC_IN;
+    gpio_interrupt1.vssel = MXC_GPIO_VSSEL_VDDIO;
+    MXC_GPIO_Config(&gpio_interrupt1);
+    MXC_GPIO_RegisterCallback(&gpio_interrupt1, gpio_isr1, &gpio_interrupt_status1);
+    MXC_GPIO_IntConfig(&gpio_interrupt1, MXC_GPIO_INT_FALLING);
+    MXC_GPIO_EnableInt(gpio_interrupt1.port, gpio_interrupt1.mask);
+    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(MXC_GPIO_GET_IDX(MXC_GPIO_PORT_INTERRUPT_IN1)));
+
+    gpio_interrupt2.port = MXC_GPIO_PORT_INTERRUPT_IN2;
+    gpio_interrupt2.mask = MXC_GPIO_PIN_INTERRUPT_IN2;
+    gpio_interrupt2.pad = MXC_GPIO_PAD_PULL_UP;
+    gpio_interrupt2.func = MXC_GPIO_FUNC_IN;
+    gpio_interrupt2.vssel = MXC_GPIO_VSSEL_VDDIO;
+    MXC_GPIO_Config(&gpio_interrupt2);
+    MXC_GPIO_RegisterCallback(&gpio_interrupt2, gpio_isr2, &gpio_interrupt_status2);
+    MXC_GPIO_IntConfig(&gpio_interrupt2, MXC_GPIO_INT_FALLING);
+    MXC_GPIO_EnableInt(gpio_interrupt2.port, gpio_interrupt2.mask);
+    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(MXC_GPIO_GET_IDX(MXC_GPIO_PORT_INTERRUPT_IN2)));
+
+    /*
+     *   Setup input pin.
+     *   Switch on EV kit is open when non-pressed, and grounded when pressed.  Use an internal pull-up so pin
+     *     reads high when button is not pressed.
+     */
+
+
+
+    return 0;
+}
