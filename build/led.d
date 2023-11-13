@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/led.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/led.o: \
  C:/MaximSDK/Libraries/MiscDrivers/LED/led.c \
  C:/MaximSDK/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include/board.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdio.h \

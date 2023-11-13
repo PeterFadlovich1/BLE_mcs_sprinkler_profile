@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/wsf_trace.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/wsf_trace.o: \
  C:/MaximSDK/Libraries/Cordio/wsf/sources/targets/baremetal/wsf_trace.c \
  C:/MaximSDK/Libraries/Cordio/wsf/include/wsf_types.h \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdint.h \

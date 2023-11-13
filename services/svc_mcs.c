@@ -46,6 +46,10 @@ const uint8_t svcMcsRUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_R };
 const uint8_t svcMcsGUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_G };
 const uint8_t svcMcsBUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_B };
 const uint8_t svcMcsXUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_X };
+const uint8_t svcMcsCancelTimerUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_CANCEL_TIMER };
+const uint8_t svcMcsOnRainUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_ON_RAIN };
+//const uint8_t svcMcsOnCapUuid[ATT_128_UUID_LEN] = { ATT_UUID_MCS_ON_CAP };
+
 
 static const uint8_t mcsValSvc[] = { ATT_UUID_MCS_SERVICE };
 static const uint16_t mcsLenSvc = sizeof(mcsValSvc);
@@ -54,11 +58,11 @@ static const uint8_t mcsButtonValCh[] = { ATT_PROP_READ | ATT_PROP_NOTIFY,
                                           UINT16_TO_BYTES(MCS_BUTTON_HDL), ATT_UUID_MCS_BUTTON };
 static const uint16_t mcsButtonLenCh = sizeof(mcsButtonValCh);
 
-static const uint8_t mcsRValCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_ON_HDL),
+static const uint8_t mcsRValCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_ON_OFF_HDL),
                                      ATT_UUID_MCS_R };
 static const uint16_t mcsRLenCh = sizeof(mcsRValCh);
 
-static const uint8_t mcsGValCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_OFF_HDL),
+static const uint8_t mcsGValCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_SENSOR_HDL),
                                      ATT_UUID_MCS_G };
 static const uint16_t mcsGLenCh = sizeof(mcsGValCh);
 
@@ -69,6 +73,21 @@ static const uint16_t mcsBLenCh = sizeof(mcsBValCh);
 static const uint8_t mcsXValCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_SCHEDULE_HDL),
                                      ATT_UUID_MCS_X };
 static const uint16_t mcsXLenCh = sizeof(mcsXValCh);
+
+static const uint8_t mcsCancelTimerCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_CANCEL_TIMER_HDL),
+                                     ATT_UUID_MCS_CANCEL_TIMER };
+static const uint16_t mcsCancelTimerLenCh = sizeof(mcsCancelTimerCh);
+
+static const uint8_t mcsOnRainCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_ON_RAIN_HDL),
+                                     ATT_UUID_MCS_ON_RAIN };
+static const uint16_t mcsOnRainLenCh = sizeof(mcsOnRainCh);
+
+#if 0
+static const uint8_t mcsOnCapCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_ON_CAP_HDL),
+                                     ATT_UUID_MCS_ON_CAP };
+static const uint16_t mcsOnCapLenCh = sizeof(mcsOnCapCh);
+#endif
+
 
 
 /*Characteristic values declaration*/
@@ -89,6 +108,17 @@ static const uint16_t mcsBValLen = sizeof(mcsBVal);
 
 static uint8_t mcsXVal[8] = { 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0};
 static const uint16_t mcsXValLen = sizeof(mcsXVal);
+
+static uint8_t mcsCancelTimer[] = { 0 };
+static const uint16_t mcsCancelTimerLen = sizeof(mcsCancelTimer);
+
+static uint8_t mcsOnRain[] = { 0 };
+static const uint16_t mcsOnRainLen = sizeof(mcsOnRain);
+
+#if 0
+static uint8_t mcsOnCap[] = { 0 };
+static const uint16_t mcsOnCapLen = sizeof(mcsOnCap);
+#endif
 
 /**************************************************************************************************
  Maxim Custom Service group
@@ -142,7 +172,28 @@ static const attsAttr_t mcsList[] = {
       ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) },
     /* X characteristic value */
     { svcMcsXUuid, (uint8_t *)mcsXVal, (uint16_t *)&mcsXValLen, sizeof(mcsXVal),
+      ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) },
+
+    /*-----------------------------*/
+    /*  X characteristic declaration */
+    { attChUuid, (uint8_t *)mcsCancelTimerCh, (uint16_t *)&mcsCancelTimerLenCh, sizeof(mcsCancelTimerCh),
+      ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) },
+    /* X characteristic value */
+    { svcMcsCancelTimerUuid, (uint8_t *)mcsCancelTimer, (uint16_t *)&mcsCancelTimerLen, sizeof(mcsCancelTimer),
+      ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) },
+
+    { attChUuid, (uint8_t *)mcsOnRainCh, (uint16_t *)&mcsOnRainLenCh, sizeof(mcsOnRainCh),
+      ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) },
+    /* X characteristic value */
+    { svcMcsOnRainUuid, (uint8_t *)mcsOnRain, (uint16_t *)&mcsOnRainLen, sizeof(mcsOnRain),
       ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) }
+#if 0
+    { attChUuid, (uint8_t *)mcsOnCapCh, (uint16_t *)&mcsOnCapLenCh, sizeof(mcsOnCapCh),
+      ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) },
+    /* X characteristic value */
+    { svcMcsOnCapUuid, (uint8_t *)mcsOnCap, (uint16_t *)&mcsOnCapLen, sizeof(mcsOnCap),
+      ATTS_SET_WRITE_CBACK, (MCS_SEC_PERMIT_READ | MCS_SEC_PERMIT_WRITE) }
+#endif
 };
 
 /* Test group structure */

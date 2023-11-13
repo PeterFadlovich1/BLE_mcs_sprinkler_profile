@@ -3,12 +3,16 @@
 
 #include "app_ui.h"
 
+#if 0
+enum {
+    MANUAL_ON = 1,
+    MANUAL_OFF,
+    MANUAL_CANCEL_TIME
+};
+#endif
 
 
-
-void manualOffHandler(uint16_t handle);
-
-void manualOnHandler(uint16_t handle);
+void manualOnOffHandler(uint16_t handle, uint8_t *pValue);
 
 void scheduleArrayHandler(uint16_t len, uint8_t *pValue);
 

@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/stdio.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/stdio.o: \
  C:/MaximSDK/Libraries/MiscDrivers/stdio.c \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\errno.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\reent.h \

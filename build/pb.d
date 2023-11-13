@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs/build/pb.o: \
+C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/pb.o: \
  C:/MaximSDK/Libraries/MiscDrivers/PushButton/pb.c \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stddef.h \
  C:/MaximSDK/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include/board.h \

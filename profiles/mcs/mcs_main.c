@@ -154,17 +154,18 @@ uint8_t McsWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uin
     
     switch (handle) {
     case MCS_BUTTON_HDL:
+        //No callback notifies the app when a state change occurs 
 
         break;
-    case MCS_ON_HDL:
+    case MCS_ON_OFF_HDL:
 
-        manualOnHandler(handle);
+        manualOnOffHandler(handle, (uint8_t *)pValue);
  
 
         break;
-    case MCS_OFF_HDL:
+    case MCS_SENSOR_HDL:
 
-        manualOffHandler(handle);
+        onSensorSet(pValue);
 
         break;
     case MCS_ROOT_HDL:

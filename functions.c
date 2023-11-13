@@ -1,3 +1,5 @@
+#if 0
+
 #define CAP_CYCLES 5
 #define ADC_SOIL_1 3
 #define ADC_SOIL_2 4
@@ -89,6 +91,7 @@ int chargeBattery(){
     setSolenoid(SOLENOID_OFF);
     return 0;
 }
+
 void manualTimerHandler(void)
 {
     // Clear interrupt
@@ -196,8 +199,8 @@ void bluetoothInterruptHandler(){
 
 void bluetoothInterruptInit(){
     MXC_TMR_ClearFlags(BLE_TIMER);
-    MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
-    NVIC_EnableIRQ(BLE_TIMER);
+    MXC_NVIC_SetVector(TMR1_IRQn, bluetoothInterruptHandler);
+    NVIC_EnableIRQ(TMR1_IRQn);
     continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
 }
-
+#endif

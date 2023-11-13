@@ -57,8 +57,8 @@
 #define BTN_MED_MS 500
 #define BTN_LONG_MS 1000
 
-#define BTN_1_TMR MXC_TMR2
-#define BTN_2_TMR MXC_TMR3
+//#define BTN_1_TMR MXC_TMR2
+//#define BTN_2_TMR MXC_TMR3
 
 /*! Enumeration of client characteristic configuration descriptors */
 enum {
@@ -164,11 +164,23 @@ static const uint8_t mcsAppAdvDataDisc[] = {
 /*! scan data, discoverable mode */
 static const uint8_t mcsAppScanDataDisc[] = {
     /*! device name */
-    4, /*! length */
+    16, /*! length */
     DM_ADV_TYPE_LOCAL_NAME, /*! AD type */
-    'M',
-    'C',
     'S',
+    'M',
+    'A',
+    'R',
+    'T',
+    '_',
+    'S',
+    'P',
+    'R',
+    'I',
+    'N',
+    'K',
+    'L',
+    'E',
+    'R'
 };
 
 /*! Mcs measurement configuration */
@@ -659,6 +671,7 @@ static void mcsAppBtnCback(uint8_t btn)
  *  \return    None.
  */
 /*************************************************************************************************/
+#if 0
 static void btnPressHandler(uint8_t btnId, PalBtnPos_t state)
 {
     if (btnId == 1) {
@@ -701,7 +714,7 @@ static void btnPressHandler(uint8_t btnId, PalBtnPos_t state)
         APP_TRACE_ERR0("Undefined button");
     }
 }
-
+#endif 
 /*************************************************************************************************/
 /*!
  *  \brief  Callback for WSF buffer diagnostic messages.
@@ -779,13 +792,13 @@ void McsAppStart(void)
     GattSetSvcChangedIdx(MCS_APP_GATT_SC_CCC_IDX);
 
     /* Register for app framework button callbacks */
-    AppUiBtnRegister(mcsAppBtnCback);
+    //AppUiBtnRegister(mcsAppBtnCback);
 
     WsfNvmInit();
 
     WsfBufDiagRegister(mcsAppWsfBufDiagnostics);
 
-    PalBtnInit(btnPressHandler);
+    //PalBtnInit(btnPressHandler);
 
     /* Reset the device */
     DmDevReset();
