@@ -6,10 +6,10 @@
 
 
 /***Solenoid Functions**************/
-#define MXC_GPIO_PORT_INTERRUPT_STATUS1 MXC_GPIO0
-#define MXC_GPIO_PIN_INTERRUPT_STATUS1 MXC_GPIO_PIN_31//31
-#define MXC_GPIO_PORT_INTERRUPT_STATUS2 MXC_GPIO0
-#define MXC_GPIO_PIN_INTERRUPT_STATUS2 MXC_GPIO_PIN_30//30
+#define MXC_GPIO_PORT_INTERRUPT_STATUS1 MXC_GPIO1
+#define MXC_GPIO_PIN_INTERRUPT_STATUS1 MXC_GPIO_PIN_9//31
+#define MXC_GPIO_PORT_INTERRUPT_STATUS2 MXC_GPIO1
+#define MXC_GPIO_PIN_INTERRUPT_STATUS2 MXC_GPIO_PIN_8//30
 
 #define SOLENOID_TIMER MXC_TMR5
   // 0 = Solenoid closed, 1 = Solenoid open
@@ -18,7 +18,7 @@ uint16_t pin = 0;
 
 void openSolenoid()
 {
-    MXC_GPIO_OutToggle(MXC_GPIO0, MXC_GPIO_PIN_30);
+    MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS2, MXC_GPIO_PIN_INTERRUPT_STATUS2);
     MXC_TMR_Start(SOLENOID_TIMER);
     printf("turned back on1!\n");
     pin = 1;
@@ -26,7 +26,7 @@ void openSolenoid()
 
 void closeSolenoid()
 {
-    MXC_GPIO_OutToggle(MXC_GPIO0, MXC_GPIO_PIN_31);
+    MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS1, MXC_GPIO_PIN_INTERRUPT_STATUS1);
     MXC_TMR_Start(SOLENOID_TIMER);
     printf("turned back on2!\n");
     pin = 2;
@@ -40,7 +40,7 @@ void SolenoidOSTHandler(void)
     // Clear interrupt
     if (SOLENOID_TIMER->wkfl & MXC_F_TMR_WKFL_A) {
         SOLENOID_TIMER->wkfl = MXC_F_TMR_WKFL_A;
-        MXC_GPIO_OutToggle( MXC_GPIO0,  pin == 1 ? MXC_GPIO_PIN_30 : MXC_GPIO_PIN_31);
+        MXC_GPIO_OutToggle( MXC_GPIO_PORT_INTERRUPT_STATUS1,  pin == 1 ? MXC_GPIO_PIN_INTERRUPT_STATUS2 : MXC_GPIO_PIN_INTERRUPT_STATUS1);
     }
 }
 
@@ -95,7 +95,7 @@ void solenoidInit(){
 
     MXC_NVIC_SetVector(TMR5_IRQn, SolenoidOSTHandler);
     NVIC_EnableIRQ(TMR5_IRQn);
-    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 1,TMR_PRES_256); //32ms
+    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 4,TMR_PRES_256); //2 = 17ms 4 = 35ms 8 = 70ms  6 = 53ms 
 
     gpio_interrupt_status1.port = MXC_GPIO_PORT_INTERRUPT_STATUS1;
     gpio_interrupt_status1.mask = MXC_GPIO_PIN_INTERRUPT_STATUS1;
@@ -103,6 +103,7 @@ void solenoidInit(){
     gpio_interrupt_status1.func = MXC_GPIO_FUNC_OUT;
     gpio_interrupt_status1.vssel = MXC_GPIO_VSSEL_VDDIOH;
     MXC_GPIO_Config(&gpio_interrupt_status1);
+    MXC_GPIO_OutSet(MXC_GPIO_PORT_INTERRUPT_STATUS1,  MXC_GPIO_PIN_INTERRUPT_STATUS1);
 
     gpio_interrupt_status2.port = MXC_GPIO_PORT_INTERRUPT_STATUS2;
     gpio_interrupt_status2.mask = MXC_GPIO_PIN_INTERRUPT_STATUS2;
