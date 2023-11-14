@@ -3,6 +3,7 @@
 #include "app_ui.h"
 #include "mcs_api.h"
 #include "tmr.h"
+#include "solenoid_fun.h"
 #define MANUAL_TIMER MXC_TMR4
 
 
@@ -13,6 +14,8 @@ extern int rootDepth;
 extern int scheduleTimeArray[8];
 extern int rainOn;
 extern int capOn;
+
+extern int solenoidState;
 
 void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 {
@@ -28,6 +31,10 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             //MXC_TMR_Shutdown(MANUAL_TIMER);
             MXC_TMR_Start(MANUAL_TIMER);
 
+            solenoidState = 1;
+            //solenoidInit();
+            openSolenoid();
+
             printf("Manual On \n");
             fflush(stdout);
 
@@ -39,6 +46,10 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             manualTime = 1;
             //MXC_TMR_Shutdown(MANUAL_TIMER);
             MXC_TMR_Start(MANUAL_TIMER);
+
+            solenoidState = 0;
+           // solenoidInit();
+            closeSolenoid();
 
             printf("Manual Off \n");
             fflush(stdout);

@@ -11,7 +11,6 @@ enum {
 };
 #endif
 
-
 void manualOnOffHandler(uint16_t handle, uint8_t *pValue);
 
 void scheduleArrayHandler(uint16_t len, uint8_t *pValue);

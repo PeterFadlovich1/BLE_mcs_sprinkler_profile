@@ -122,4 +122,4 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/main.o: \
  C:/MaximSDK/Libraries/Cordio/controller/include/ble/ll_api.h \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_cfg.h mcs_app_api.h \
  C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_ui.h \
- BLE_handlers.h
+ BLE_handlers.h solenoid_fun.h

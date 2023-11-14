@@ -1,4 +1,4 @@
-
+#if 0
 #define CAP_CYCLES 5
 #define ADC_SOIL_1 3
 #define ADC_SOIL_2 4
@@ -270,3 +270,4 @@ void startRainSystem(){
     MXC_NVIC_SetVector(TMR2_IRQn, rainTimerHandler);
     MXC_NVIC_SetVector(TMR3_IRQn, rainStartMeasurement);
 }
+#endif

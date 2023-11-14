@@ -52,6 +52,9 @@ connection requests.
 #include "adc.h"
 #include "lp.h"
 #include "nvic_table.h"
+#include "pb.h"
+#include "board.h"
+#include "gpio.h"
 
 #if defined(HCI_TR_EXACTLE) && (HCI_TR_EXACTLE == 1)
 #include "ll_init_api.h"
@@ -65,6 +68,8 @@ connection requests.
 #include "mcs_api.h"
 #include "BLE_handlers.h"
 
+#include "solenoid_fun.h"
+
 /**************************************************************************************************
   Macros
 **************************************************************************************************/
@@ -77,14 +82,18 @@ connection requests.
 #define BLE_TIMER MXC_TMR3
 #define MANUAL_TIMER MXC_TMR4
 
-//#define TAKE_SAMPLE_TIMER MXC_TMR5
-//#define SAMPLE_PERIOD_TIMER MXC_TMR5
+#define TAKE_SAMPLE_TIMER MXC_TMR1
+#define SAMPLE_PERIOD_TIMER MXC_TMR5
 
 
-//#define MOISTURE_READ_1 MXC_ADC_CH_0
-//#define MOISTURE_READ_2 MXC_ADC_CH_1
-//#define RAIN_READ MXC_ADC_CH_2
-//#define RAIN_VOLTAGE_THRESHOLD 0x1ff
+#define MOISTURE_READ_1 MXC_ADC_CH_0
+#define MOISTURE_READ_2 MXC_ADC_CH_1
+#define RAIN_READ MXC_ADC_CH_2
+#define RAIN_VOLTAGE_THRESHOLD 0x1ff
+
+/**Defines for Solanoid Open Close****************************/
+
+#define SOLENOID_TIMER MXC_TMR5
 
 /**************************************************************************************************
   Global Variables
@@ -105,6 +114,7 @@ int rootDepth = 0;
 int scheduleTimeArray[8] = { 0, 0, 0, 0, 0, 0, 0, 0};
 int rainOn = 0;
 int capOn = 0;
+int solenoidState = 0;
 
 //Data Storage Globals
 int rainSensorData[5000] = {};
@@ -209,7 +219,7 @@ void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
     tmr.pres = prescalar;
     tmr.mode = TMR_MODE_ONESHOT;
     tmr.bitMode = TMR_BIT_MODE_32;
-    tmr.clock = MXC_TMR_32K_CLK;
+    tmr.clock = MXC_TMR_32K_CLK; //was 32k switched to 8k for timer 5 usage as a one shot
     tmr.cmp_cnt = ticks; //SystemCoreClock*(1/interval_time);
     tmr.pol = 0;
 
@@ -240,7 +250,7 @@ void manualInterruptInit(){
     //fflush(stdout);
     MXC_NVIC_SetVector(TMR4_IRQn, manualTimerHandler);
     NVIC_EnableIRQ(TMR4_IRQn);
-    oneshotTimerInit(MANUAL_TIMER, 80,TMR_PRES_4096);//14400 = 30min
+    oneshotTimerInit(MANUAL_TIMER, 80,TMR_PRES_4096);//14400 = 30min //80 for 10s
     //printf("Manual Interupt Init End \n");
     //fflush(stdout);
 }
@@ -438,9 +448,7 @@ void startRainSystem(){
     printf("Start Rain end\n");
     fflush(stdout);
 }
-#endif 
-
-
+#endif
 
 /*************************************************************************************************/
 /*!
@@ -521,14 +529,37 @@ int main(void)
 
     manualInterruptInit();
 
+    solenoidInit();
+
+    //openSolenoid();
+
+
+    //while(1){
+    //    openSolenoid();
+    //    MXC_Delay(1000000);
+    //}
+
+
+
     while(1){
-        //printf("test\n");
+        while(solenoidState == 0){
+
+
+
+
+        }
+        McsSetFeatures(1);
+        printf("Solenoid Open\n");
+        fflush(stdout);
+
+        while(solenoidState == 1){
+
+        }
+        McsSetFeatures(0);
+        printf("Solenoid Closed\n");
+        fflush(stdout);
+
     }
-
-    //initADC(MXC_ADC_MONITOR_0,MXC_ADC_CH_0,0x3ff);
-
-    //initMoistureRainSystem();
-
 
 #if 0
     //while(1){
@@ -551,6 +582,10 @@ int main(void)
         }
     //}
 #endif
+
+    while(1){
+
+    }
     return 0;
 }
 

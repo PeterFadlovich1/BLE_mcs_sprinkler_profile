@@ -79,4 +79,5 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/BLE_handlers.o: \
  C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_sys.h \
  C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/gcr_regs.h \
  C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/lpgcr_regs.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/mcr_regs.h
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/mcr_regs.h \
+ solenoid_fun.h
