@@ -5,6 +5,7 @@
 #include "tmr.h"
 #include "solenoid_fun.h"
 #define MANUAL_TIMER MXC_TMR4
+#define TAKE_SAMPLE_TIMER MXC_TMR1
 
 
 extern int manualOff;
@@ -29,7 +30,7 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             manualOff = 0;
             manualTime = 1;
             //MXC_TMR_Shutdown(MANUAL_TIMER);
-            MXC_TMR_Start(MANUAL_TIMER);
+            //MXC_TMR_Start(MANUAL_TIMER);
 
             solenoidState = 1;
             //solenoidInit();
@@ -45,10 +46,10 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             manualOff = 1;
             manualTime = 1;
             //MXC_TMR_Shutdown(MANUAL_TIMER);
-            MXC_TMR_Start(MANUAL_TIMER);
+            //MXC_TMR_Start(MANUAL_TIMER);
 
             solenoidState = 0;
-           // solenoidInit();
+            //solenoidInit();
             closeSolenoid();
 
             printf("Manual Off \n");
@@ -59,9 +60,9 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             manualOn = 0;
             manualOff = 0;
             manualTime = 0;
-            MXC_TMR_Stop(MANUAL_TIMER);
-            MXC_TMR_SetCount(MANUAL_TIMER,0);
-            MXC_TMR_ClearFlags(MANUAL_TIMER);
+            //MXC_TMR_Stop(MANUAL_TIMER);
+            //MXC_TMR_SetCount(MANUAL_TIMER,0);
+            //MXC_TMR_ClearFlags(MANUAL_TIMER);
 
             printf("Cancel Timer \n");
             fflush(stdout);
@@ -76,12 +77,21 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 
 }
 
+int timeConverter(uint8_t time){
+    int hour = (time/4)*100; 
+    int minute = (time%4)*15;
+    return hour+minute;
+
+}
+
 void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
 {
     int i = 0;
+    printf("callback hit");
+    fflush(stdout);
     for (i = 0; i < len; i++){
-        printf("pValue test: %u \n \n", *(pValue + i));
-        scheduleTimeArray[i] = *(pValue + i);
+        //printf("pValue test: %u \n \n", *(pValue + i));
+        scheduleTimeArray[i] = timeConverter(*(pValue + i));
         printf("Array test: %u \n", scheduleTimeArray[i]);
     }
     fflush(stdout);
@@ -104,10 +114,24 @@ void onSensorSet( uint8_t *pValue){
         fflush(stdout);
         break;
 
-        case 2: //cap On
+        case 2: //rain off
+        rainOn = 0;
+        printf("rainOn: %u \n", rainOn);
+        fflush(stdout);
+        MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
+        break;
+
+        case 3: //cap On
         capOn = 1;
         printf("capOn: %u \n", capOn);
         fflush(stdout);
+        break;
+
+        case 4: //cap Off
+        capOn = 0;
+        printf("capOn: %u \n", capOn);
+        fflush(stdout);
+        MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
         break;
     }
 }

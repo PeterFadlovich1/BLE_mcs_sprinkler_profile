@@ -8,4 +8,6 @@ void closeSolenoid();
 
 void solenoidInit();
 
+void GPIOINIT();
+
 #endif 

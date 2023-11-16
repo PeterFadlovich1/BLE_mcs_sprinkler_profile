@@ -85,7 +85,7 @@ typedef union {
 
 /*! configurable parameters for advertising */
 static const appAdvCfg_t mcsAppAdvCfg = {
-    { 30000, 0, 0 }, /*! Advertising durations in ms */
+    { 30000, 30000, 0 }, /*! Advertising durations in ms */
     { 96, 1600, 0 } /*! Advertising intervals in 0.625 ms units */
 };
 

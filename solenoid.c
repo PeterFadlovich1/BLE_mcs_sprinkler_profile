@@ -11,39 +11,10 @@
 #define MXC_GPIO_PORT_INTERRUPT_STATUS2 MXC_GPIO1
 #define MXC_GPIO_PIN_INTERRUPT_STATUS2 MXC_GPIO_PIN_8//30
 
-#define SOLENOID_TIMER MXC_TMR5
+#define SOLENOID_TIMER MXC_TMR4
   // 0 = Solenoid closed, 1 = Solenoid open
 
 uint16_t pin = 0;
-
-void openSolenoid()
-{
-    MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS2, MXC_GPIO_PIN_INTERRUPT_STATUS2);
-    MXC_TMR_Start(SOLENOID_TIMER);
-    printf("turned back on1!\n");
-    pin = 1;
-}
-
-void closeSolenoid()
-{
-    MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS1, MXC_GPIO_PIN_INTERRUPT_STATUS1);
-    MXC_TMR_Start(SOLENOID_TIMER);
-    printf("turned back on2!\n");
-    pin = 2;
-}
-
-void SolenoidOSTHandler(void)
-{
-    // Clear interrupt
-    MXC_TMR_ClearFlags(SOLENOID_TIMER);
-
-    // Clear interrupt
-    if (SOLENOID_TIMER->wkfl & MXC_F_TMR_WKFL_A) {
-        SOLENOID_TIMER->wkfl = MXC_F_TMR_WKFL_A;
-        MXC_GPIO_OutToggle( MXC_GPIO_PORT_INTERRUPT_STATUS1,  pin == 1 ? MXC_GPIO_PIN_INTERRUPT_STATUS2 : MXC_GPIO_PIN_INTERRUPT_STATUS1);
-    }
-}
-
 
 void oneshotTimerInit8kTimer5(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar)
 {
@@ -63,7 +34,7 @@ void oneshotTimerInit8kTimer5(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pre
     tmr.pres = prescalar;
     tmr.mode = TMR_MODE_ONESHOT;
     tmr.bitMode = TMR_BIT_MODE_32;
-    tmr.clock = MXC_TMR_8K_CLK; //was 32k switched to 8k for timer 5 usage as a one shot
+    tmr.clock = MXC_TMR_32K_CLK; //was 32k switched to 8k for timer 5 usage as a one shot
     tmr.cmp_cnt = ticks; //SystemCoreClock*(1/interval_time);
     tmr.pol = 0;
 
@@ -71,7 +42,7 @@ void oneshotTimerInit8kTimer5(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pre
         printf("Failed Continuous timer Initialization.\n");
         return;
     }
-    
+
     MXC_TMR_EnableInt(timer);
 
     // Clear Wakeup status
@@ -81,21 +52,58 @@ void oneshotTimerInit8kTimer5(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pre
     // Enable Timer wake-up source
     MXC_TMR_EnableWakeup(timer, &tmr);
 
-    //OneshotTimer();
+    //MXC_TMR_SetCount(timer,0);
 
-    //printf("Oneshot timer started.\n\n");
-
-    //MXC_TMR_Start(timer);
+    //MXC_TMR_ClearFlags(timer);
+    printf("solenoid oneshot initialized\n");
+    fflush(stdout);
     
 }
 
+void openSolenoid()
+{
+    MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS2, MXC_GPIO_PIN_INTERRUPT_STATUS2);
+    MXC_TMR_Start(SOLENOID_TIMER);
+    //oneshotTimerInit8kTimer5(SOLENOID_TIMER, 15,TMR_PRES_64);
+    printf("turned back on1!\n");
+    pin = 1;
+}
+
+void closeSolenoid()
+{
+    MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS1, MXC_GPIO_PIN_INTERRUPT_STATUS1);
+    MXC_TMR_Start(SOLENOID_TIMER);
+    //oneshotTimerInit8kTimer5(SOLENOID_TIMER, 15,TMR_PRES_64);
+    printf("turned back on2!\n");
+    pin = 2;
+}
+
+void SolenoidOSTHandler(void)
+{
+    // Clear 
+    printf("solenoid interrupt");
+    fflush(stdout);
+    MXC_TMR_ClearFlags(SOLENOID_TIMER);
+    //MXC_TMR_Shutdown(SOLENOID_TIMER);
+
+    // Clear interrupt
+    if (SOLENOID_TIMER->wkfl & MXC_F_TMR_WKFL_A) {
+        SOLENOID_TIMER->wkfl = MXC_F_TMR_WKFL_A;
+        MXC_GPIO_OutToggle( MXC_GPIO_PORT_INTERRUPT_STATUS1,  pin == 1 ? MXC_GPIO_PIN_INTERRUPT_STATUS2 : MXC_GPIO_PIN_INTERRUPT_STATUS1);
+    }
+}
+
+
+
 void solenoidInit(){
+    //MXC_TMR_ClearFlags(SOLENOID_TIMER);
     mxc_gpio_cfg_t gpio_interrupt_status1;
     mxc_gpio_cfg_t gpio_interrupt_status2;
 
-    MXC_NVIC_SetVector(TMR5_IRQn, SolenoidOSTHandler);
-    NVIC_EnableIRQ(TMR5_IRQn);
-    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 4,TMR_PRES_256); //2 = 17ms 4 = 35ms 8 = 70ms  6 = 53ms 
+    MXC_NVIC_SetVector(TMR4_IRQn, SolenoidOSTHandler);
+    NVIC_EnableIRQ(TMR4_IRQn);
+    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 15,TMR_PRES_64); //30ms on 32k clock 15
+    //MXC_TMR_Shutdown(SOLENOID_TIMER);
 
     gpio_interrupt_status1.port = MXC_GPIO_PORT_INTERRUPT_STATUS1;
     gpio_interrupt_status1.mask = MXC_GPIO_PIN_INTERRUPT_STATUS1;
@@ -116,3 +124,21 @@ void solenoidInit(){
 
 }
 
+void GPIOINIT(){
+    mxc_gpio_cfg_t gpio_moisture_enable1;
+    mxc_gpio_cfg_t gpio_moisture_enable2;
+
+    gpio_moisture_enable1.port = MXC_GPIO0;
+    gpio_moisture_enable1.mask = MXC_GPIO_PIN_21;
+    gpio_moisture_enable1.pad = MXC_GPIO_PAD_NONE;
+    gpio_moisture_enable1.func = MXC_GPIO_FUNC_OUT;
+    gpio_moisture_enable1.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    MXC_GPIO_Config(&gpio_moisture_enable1);
+
+    gpio_moisture_enable2.port = MXC_GPIO0;
+    gpio_moisture_enable2.mask = MXC_GPIO_PIN_22;
+    gpio_moisture_enable2.pad = MXC_GPIO_PAD_NONE;
+    gpio_moisture_enable2.func = MXC_GPIO_FUNC_OUT;
+    gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    MXC_GPIO_Config(&gpio_moisture_enable2);
+}

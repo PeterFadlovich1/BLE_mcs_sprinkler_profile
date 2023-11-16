@@ -99,7 +99,9 @@
         "mcs_api.h": "c",
         "svc_mcs.h": "c",
         "mcs_app_api.h": "c",
-        "cstdio": "c"
-    }
+        "cstdio": "c",
+        "tmr_common.h": "c"
+    },
+    "cortex-debug.variableUseNaturalFormat": false
 }
 
