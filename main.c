@@ -114,13 +114,11 @@ int capOn = 0;
 int solenoidState = 0;
 
 //Data Storage Globals
-int rainSensorData[5000] = {};
-int rainSampleDataCount = 0;
-int rainSampleCycle[10] = {};
-int rainSampleCycleCount = 0;
+int rainSensorData[5000];
+int capSensorData[5000];
 
 int batteryLow, scheduledTimeOn, raining, highMoisture, lowMoisture, scheduledTimeOff;
-int moistureAvg1, moistureAvg2, moistureCount, rainPeaks, rainCount;
+int moistureAvg, moistureCount, rainPeaks, rainCount;
 
 /**************************************************************************************************
   Functions
@@ -382,6 +380,7 @@ void initADC(mxc_adc_monitor_t monitor, mxc_adc_chsel_t chan, uint16_t hithresh)
     //NVIC_EnableIRQ(ADC_IRQn);
 }
 
+#if 0
 void rainTimerHandler(){
     /*code here will be based of off characterization*/
     raining = rainPeaks > 3 ? TRUE : FALSE;
@@ -406,22 +405,23 @@ void moistureTimerHandler(){
     fflush(stdout);
     return;
 }
-
-void moistureStartMeasurement(){\
+#endif
+void moistureStartMeasurement(){
     MXC_TMR_ClearFlags(TAKE_SAMPLE_TIMER);
     if(moistureCount%2 == 0){
-        //MXC_GPIO_OutSet(MXC_GPIO0,  MXC_GPIO_PIN_21);
-        adcval = MXC_ADC_StartConversion(MOISTURE_READ_1);
-        printf("ADC moisture 1 reading %u: \n", adcval);
+        MXC_GPIO_OutSet(MXC_GPIO0,  MXC_GPIO_PIN_21);
+        float adcval = MXC_ADC_StartConversion(MOISTURE_READ_1)*(1.22/1024);
+        printf("ADC moisture 1 reading %f: \n", adcval);
         //MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_21);
     }
     else{
-        MXC_GPIO_OutSet(MXC_GPIO0, MXC_GPIO_PIN_22);
-        adcval = MXC_ADC_StartConversion(MOISTURE_READ_1);
-        printf("ADC moisture 2 reading %u: \n", adcval);
+        //MXC_GPIO_OutSet(MXC_GPIO0, MXC_GPIO_PIN_22);
+        float adcval = MXC_ADC_StartConversion(MOISTURE_READ_1)*(1.22/1024);
+        printf("ADC moisture 2 reading %f: \n", adcval);
         //MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_22);
     }
     moistureCount++;
+    moistureAvg+=adcval;
 }
 
 
@@ -438,9 +438,10 @@ void rainStartMeasurement(){
         printf("ADC reading %u: \n", adcval);
     }
     rainCount++;
-
     printf("Rain Count %u: \n", rainCount);
-
+    if (adcval < RAIN_VOLTAGE_THRESHOLD){
+        rainPeaks++;
+    }
 }
 
 void initMoistureRainSystem(){
