@@ -66,9 +66,35 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/main.o: \
  C:/MaximSDK/Libraries/Cordio/wsf/include/wsf_queue.h \
  C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_terminal.h \
  C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_delay.h \
- profiles/mcs/mcs_api.h services/svc_mcs.h \
- C:/MaximSDK/Libraries/Cordio/wsf/include/util/bstream.h \
- C:/MaximSDK/Libraries/Cordio/ble-profiles/sources/services/svc_cfg.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/tmr.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_device.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/max32655.h \
+ C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/core_cm4.h \
+ C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/cmsis_version.h \
+ C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/cmsis_compiler.h \
+ C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/cmsis_gcc.h \
+ C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/mpu_armv7.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/system_max32655.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_errors.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_pins.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/gpio.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/gpio_regs.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/tmr_regs.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_sys.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/gcr_regs.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/lpgcr_regs.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/mcr_regs.h \
+ c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdbool.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/adc.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/adc_regs.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/lp.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/pwrseq_regs.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/lpcmp.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/lpcmp_regs.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/tmr.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/nvic_table.h \
+ C:/MaximSDK/Libraries/MiscDrivers/PushButton/pb.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/gpio.h \
  C:/MaximSDK/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include/board.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdio.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\types.h \
@@ -85,35 +111,6 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/main.o: \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\stdio.h \
  C:/MaximSDK/Libraries/MiscDrivers/LED/led.h \
  C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_assert.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/gpio.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/gpio_regs.h \
- C:/MaximSDK/Libraries/MiscDrivers/PushButton/pb.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/tmr.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_device.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/max32655.h \
- C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/core_cm4.h \
- C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/cmsis_version.h \
- C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/cmsis_compiler.h \
- C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/cmsis_gcc.h \
- C:/MaximSDK/Libraries/CMSIS/5.9.0/Core/Include/mpu_armv7.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/system_max32655.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_errors.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_pins.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/gpio.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/tmr_regs.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_sys.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/gcr_regs.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/lpgcr_regs.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/mcr_regs.h \
- c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdbool.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/adc.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/adc_regs.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/lp.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/pwrseq_regs.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/lpcmp.h \
- C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/lpcmp_regs.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/tmr.h \
- C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/nvic_table.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/ble/ll_init_api.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/common/bb_api.h \
  C:/MaximSDK/Libraries/Cordio/controller/include/common/cfg_mac.h \
@@ -122,4 +119,7 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/main.o: \
  C:/MaximSDK/Libraries/Cordio/controller/include/ble/ll_api.h \
  C:/MaximSDK/Libraries/Cordio/platform/include/pal_cfg.h mcs_app_api.h \
  C:/MaximSDK/Libraries/Cordio/ble-profiles/include/app_ui.h \
- BLE_handlers.h solenoid_fun.h
+ profiles/mcs/mcs_api.h services/svc_mcs.h \
+ C:/MaximSDK/Libraries/Cordio/wsf/include/util/bstream.h \
+ C:/MaximSDK/Libraries/Cordio/ble-profiles/sources/services/svc_cfg.h \
+ BLE_handlers.h solenoid_fun.h functions.h

@@ -4,8 +4,10 @@
 #include "mcs_api.h"
 #include "tmr.h"
 #include "solenoid_fun.h"
+#include "functions.h"
 #define MANUAL_TIMER MXC_TMR4
 #define TAKE_SAMPLE_TIMER MXC_TMR1
+#define PWM_TIMER MXC_TMR3
 
 
 extern int manualOff;
@@ -16,12 +18,10 @@ extern int scheduleTimeArray[8];
 extern int rainOn;
 extern int capOn;
 
-extern int solenoidState;
-
 void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 {
-    printf("sent value: %u \n", *pValue);
-    fflush(stdout);
+    //printf("sent value: %u \n", *pValue);
+    //fflush(stdout);
 
     switch(*pValue){
         case 1: //Manual ON
@@ -32,8 +32,7 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             //MXC_TMR_Shutdown(MANUAL_TIMER);
             //MXC_TMR_Start(MANUAL_TIMER);
 
-            solenoidState = 1;
-            //solenoidInit();
+
             openSolenoid();
 
             printf("Manual On \n");
@@ -48,8 +47,6 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             //MXC_TMR_Shutdown(MANUAL_TIMER);
             //MXC_TMR_Start(MANUAL_TIMER);
 
-            solenoidState = 0;
-            //solenoidInit();
             closeSolenoid();
 
             printf("Manual Off \n");
@@ -109,29 +106,32 @@ void onSensorSet( uint8_t *pValue){
 
     switch(*pValue){
         case 1: //rain on
-        rainOn = 1;
-        printf("rainOn: %u \n", rainOn);
-        fflush(stdout);
+        //rainOn = 1;
+        startRainSystem();
+        //printf("rainOn: %u \n", rainOn);
+        //fflush(stdout);
         break;
 
         case 2: //rain off
-        rainOn = 0;
-        printf("rainOn: %u \n", rainOn);
-        fflush(stdout);
+        //rainOn = 0;
+        //printf("rainOff: %u \n", rainOn);
+        //fflush(stdout);
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
         break;
 
         case 3: //cap On
-        capOn = 1;
-        printf("capOn: %u \n", capOn);
-        fflush(stdout);
+        //capOn = 1;
+        startMoistureSystem();
+        //printf("capOn: %u \n", capOn);
+        //fflush(stdout);
         break;
 
         case 4: //cap Off
-        capOn = 0;
-        printf("capOn: %u \n", capOn);
-        fflush(stdout);
+        //capOn = 0;
+        //printf("capOff: %u \n", capOn);
+        //fflush(stdout);
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
+        MXC_TMR_Stop(PWM_TIMER);
         break;
     }
 }

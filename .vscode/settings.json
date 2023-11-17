@@ -100,7 +100,8 @@
         "svc_mcs.h": "c",
         "mcs_app_api.h": "c",
         "cstdio": "c",
-        "tmr_common.h": "c"
+        "tmr_common.h": "c",
+        "wsf_os.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

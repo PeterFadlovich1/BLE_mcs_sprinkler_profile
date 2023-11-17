@@ -1,170 +1,69 @@
-#if 0
-#define CAP_CYCLES 5
-#define ADC_SOIL_1 3
-#define ADC_SOIL_2 4
-#define ADC_RAIN 6
-#define RAIN_VOLTAGE_THRESHOLD 0x1ff
-#define RAIN_TIME 120
-#define SOLENOID_ON 1
-#define SOLENOID_OFF 0
-#define MANUAL_TIMER MXC_TMR0
-#define BLE_TIMER MXC_TMR1
-#define TAKE_SAMPLE_TIMER MXC_TMR2
-#define SAMPLE_PERIOD_TIMER MXC_TMR3
-#define MOISTURE_READ_1 MXC_ADC_CH_0
-#define MOISTURE_READ_2 MXC_ADC_CH_1
-#define RAIN_READ MXC_ADC_CH_2
-//#include "ADC_lib.h"
 #include "tmr.h"
-#include "mxc_delay.h"
+#include <stdbool.h>
+#include <stdio.h>
 #include "adc.h"
-#include "stdio.h"
-int batteryLow, manualOn, scheduledTimeOn, manualOff, raining, highMoisture, lowMoisture, scheduledTimeOff, manualTime;
-int moistureAvg1, moistureAvg2, moistureCount, rainPeaks, rainCount;
+#include "solenoid_fun.h"
+#include "BLE_handlers.h"
+#include "mxc_delay.h"
+#include "nvic_table.h"
+#include "lp.h"
 
-void moisture_cb1(void *req, int adcRead){
-    moistureCount++;
-    moistureAvg1+=adcRead;
-    return;
-}
+#include <string.h>
+#include "wsf_types.h"
+#include "wsf_trace.h"
+#include "wsf_bufio.h"
+#include "wsf_msg.h"
+#include "wsf_assert.h"
+#include "wsf_buf.h"
+#include "wsf_heap.h"
+#include "wsf_cs.h"
+#include "wsf_timer.h"
+#include "wsf_os.h"
 
-void moisture_cb2(void *req, int adcRead){
-    moistureAvg2+=adcRead;
-    return;
-}
 
-void rain_cb(void *req, int adcRead){
-    rainCount++;
-    if (adcRead < RAIN_VOLTAGE_THRESHOLD){
-        rainPeaks++;
-    }
-    return;
-}
 
-void rainTimerHandler(){
-    /*code here will be based of off characterization*/
-    raining = rainPeaks > 3 ? TRUE : FALSE;
-    MXC_TMR_Stop(SAMPLE_PERIOD_TIMER);
-    return;
-}
 
-void moistureTimerHandler(){
-    /*code here will be based off of characterization and rootdepth*/
-    moistureAvg1 = moistureAvg1/moistureCount;
-    moistureAvg2 = moistureAvg2/moistureCount;
-    highMoisture = moistureAvg1 < 0x0ff;
-    lowMoisture = moistureAvg2 > 0x2ff;
-    MXC_TMR_Stop(SAMPLE_PERIOD_TIMER);
-    return;
-}
 
-void moistureStartMeasurement(){
-    MXC_ADC_StartConversionAsync(MOISTURE_READ_1, moisture_cb1);
-    MXC_ADC_StartConversionAsync(MOISTURE_READ_2, moisture_cb2);
-}
-void rainStartMeasurement(){
-    MXC_ADC_StartConversionAsync(RAIN_READ, rain_cb);
-}
 
-void ADC_IRQHandler(void)
-{
-    MXC_ADC_Handler();
-}
 
-int onLoop(){
-    while(1){
-        if(batteryLow){
-            chargeBattery();
-        }
-        else if(manualOn){
-            break;
-        }
-        else if(scheduledTimeOn && !manualOff && !raining && !highMoisture){
-            break;
-        }
-        else if(lowMoisture && !manualOff && !raining){
-            break;
-        }
-    }
-    return 0;
-}
+#define BLE_TIMER MXC_TMR2
+#define PWM_TIMER MXC_TMR3
+#define TAKE_SAMPLE_TIMER MXC_TMR1
 
-int offLoop(){
-    while(1){
-        if(manualOn){
-            continue;
-        }
-        else if(manualOff || raining || highMoisture || scheduledTimeOff){
-            break;
-        }
-    }
-    return 0;
-}
 
-int readSoil(int *soil1, int *soil2){
-    int cycles;
-    int avg1, avg2 = 0;
-    PWM_init();
-    for(cycles = 0; cycles < CAP_CYCLES; cycles++){
-        avg1 += ADC_conversion(ADC_SOIL_1);
-        MXC_Sleep(500000);
-    }
-    *soil1 = avg1/CAP_CYCLES;
-    for(cycles = 0; cycles < CAP_CYCLES; cycles++){
-        avg2 += ADC_conversion(ADC_SOIL_2);
-        MXC_Sleep(500000);
-    }
-    *soil2 = avg2/CAP_CYCLES;
-    return 0;
-}
+#define MOISTURE_READ_1 MXC_ADC_CH_0
+#define RAIN_READ_1 MXC_ADC_CH_1
+#define RAIN_READ_2 MXC_ADC_CH_2
+#define RAIN_VOLTAGE_THRESHOLD 0x1ff
 
-int getRainStatus(int avg, int outliers){
-    return 0;
-}
 
-int readRain(){
-    int avg, count, outliers, reading = 0;
-    MXC_RTC_Start();
-    while(MXC_RTC_GetSeconds() < RAIN_TIME){
-        reading = ADC_conversion(ADC_RAIN);
-        if (reading < RAIN_VOLTAGE_THRESHOLD){
-            outliers++;
-        }
-        avg+=reading;
-        count++;
-    }
-    avg = avg/count;
-    return getRainStatus(avg, outliers);
-}
 
-int setSolenoid(int desired_state){
-    return 0;
-}
+int moistureCount;
+int moistureSum;
+int moistureAvg;
+int capSensorData[5000];
 
-int chargeBattery(){
-    setSolenoid(SOLENOID_ON);
-    MXC_Delay(60000000);
-    setSolenoid(SOLENOID_OFF);
-    return 0;
-}
+int rainCount;
+int rainPeaks;
+int rainSensorData[5000];
 
-void manualTimerHandler(void)
-{
-    // Clear interrupt
-    MXC_TMR_ClearFlags(MANUAL_TIMER);
-    manualOff = 0;
-    manualOn = 0;
-    manualTime = 0;
 
-}
+int manualOff = 0;
+int manualOn = 0;
+int manualTime = 0;
+int rootDepth = 0;
+int scheduleTimeArray[8] = { 0, 0, 0, 0, 0, 0, 0, 0};
+int rainOn = 0;
+int capOn = 0;
 
-void rainCompleteTimerHandler(void){
+int scheduledTimeOn;
+int scheduledTimeOff;
+int batteryLow;
+int lowMoisture;
+int highMoisture;
+int raining;
 
-}
 
-void moistureCompleteTimerHandler(void){
-
-}
 void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar)
 {
     // Declare variables
@@ -183,7 +82,7 @@ void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
     tmr.pres = prescalar;
     tmr.mode = TMR_MODE_ONESHOT;
     tmr.bitMode = TMR_BIT_MODE_32;
-    tmr.clock = MXC_TMR_32K_CLK;
+    tmr.clock = MXC_TMR_32K_CLK; //was 32k switched to 8k for timer 5 usage as a one shot
     tmr.cmp_cnt = ticks; //SystemCoreClock*(1/interval_time);
     tmr.pol = 0;
 
@@ -191,7 +90,7 @@ void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
         printf("Failed Continuous timer Initialization.\n");
         return;
     }
-
+    
     MXC_TMR_EnableInt(timer);
 
     // Clear Wakeup status
@@ -201,16 +100,15 @@ void oneshotTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t pres
     // Enable Timer wake-up source
     MXC_TMR_EnableWakeup(timer, &tmr);
 
-    printf("Oneshot timer started.\n\n");
+    //OneshotTimer();
 
-    //MXC_TMR_Start(OST_TIMER);
+    //printf("Oneshot timer started.\n\n");
+
+    //MXC_TMR_Start(timer);
+    
 }
 
-void manualInterruptInit(){
-    MXC_NVIC_SetVector(TMR0_IRQn, manualTimerHandler);
-    NVIC_EnableIRQ(TMR0_IRQn);
-    oneshotTimerInit(MANUAL_TIMER, 14400,TMR_PRES_4096);
-}
+
 
 void continuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t prescalar, int enable)
 {
@@ -230,19 +128,76 @@ void continuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
     tmr.pres = prescalar;
     tmr.mode = TMR_MODE_CONTINUOUS;
     tmr.bitMode = TMR_BIT_MODE_16B;
-    tmr.clock = MXC_TMR_8M_CLK;
+    tmr.clock = MXC_TMR_32K_CLK;
     tmr.cmp_cnt =ticks; //SystemCoreClock*(1/interval_time);
     tmr.pol = 0;
+
+
 
     if (MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
         printf("Failed Continuous timer Initialization.\n");
         return;
     }
-    if (!enable){
+    if (enable == FALSE){
+        
         MXC_TMR_Stop(timer);
+        //MXC_TMR_SetCount(timer, 0);
+        //MXC_TMR_ClearFlags(timer);
+        printf("Stop/Reset timer \n");
+        fflush(stdout);
     }
+
     return;
+#if 0
+    if (enable == TRUE && MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
+        printf("Failed Continuous timer Initialization.\n");
+        int flag = MXC_TMR_Init(timer, &tmr, true);
+        printf("Error Flag %d \n", flag);
+        return;
+    }
+#endif
 }
+
+void PWMTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, uint32_t dutyTicks, mxc_tmr_pres_t prescalar)
+{
+    // Declare variables
+    mxc_tmr_cfg_t tmr; // to configure timer
+    //unsigned int periodTicks = MXC_TMR_GetPeriod(PWM_TIMER, PWM_CLOCK_SOURCE, 16, FREQ);
+    //unsigned int dutyTicks = periodTicks * DUTY_CYCLE / 100;
+
+    /*
+    Steps for configuring a timer for PWM mode:
+    1. Disable the timer
+    2. Set the pre-scale value
+    3. Set polarity, PWM parameters
+    4. Configure the timer for PWM mode
+    5. Enable Timer
+    */
+
+    MXC_TMR_Shutdown(PWM_TIMER);
+
+    tmr.pres = prescalar;
+    tmr.mode = TMR_MODE_PWM;
+    tmr.bitMode = TMR_BIT_MODE_32;
+    tmr.clock = MXC_TMR_8M_CLK;
+    tmr.cmp_cnt = ticks;
+    tmr.pol = 1;
+
+    if (MXC_TMR_Init(timer, &tmr, true) != E_NO_ERROR) {
+        printf("Failed PWM timer Initialization.\n");
+        return;
+    }
+
+    if (MXC_TMR_SetPWM(timer, dutyTicks) != E_NO_ERROR) {
+        printf("Failed TMR_PWMConfig.\n");
+        return;
+    }
+
+    //MXC_TMR_Start(PWM_TIMER);
+
+    //printf("PWM started.\n\n");
+}
+
 
 void bluetoothInterruptHandler(){
     MXC_TMR_ClearFlags(BLE_TIMER);
@@ -254,20 +209,157 @@ void bluetoothInterruptHandler(){
         WsfTimerSleep();
 
     }
+    //printf("BLE interupt \n");
+    //fflush(stdout);
 }
 
 void bluetoothInterruptInit(){
-    MXC_TMR_ClearFlags(BLE_TIMER);
-    MXC_NVIC_SetVector(BLE_TIMER, bluetoothInterruptHandler);
-    NVIC_EnableIRQ(BLE_TIMER);
-    continuousTimerInit(BLE_TIMER, 49,TMR_PRES_4096, TRUE); //temp value of 25ms
+    MXC_NVIC_SetVector(TMR2_IRQn, bluetoothInterruptHandler);
+    NVIC_EnableIRQ(TMR2_IRQn);
+    continuousTimerInit(BLE_TIMER, 25,TMR_PRES_32, TRUE); //temp value of 25ms ~ 25 
 }
 
 
-void startRainSystem(){
-    MXC_TMR_Start(TAKE_SAMPLE_TIMER);
-    MXC_TMR_Start(SAMPLE_PERIOD_TIMER);
-    MXC_NVIC_SetVector(TMR2_IRQn, rainTimerHandler);
-    MXC_NVIC_SetVector(TMR3_IRQn, rainStartMeasurement);
+
+void initADC(mxc_adc_monitor_t monitor, mxc_adc_chsel_t chan, uint16_t hithresh){
+    if (MXC_ADC_Init() != E_NO_ERROR) {
+        printf("Error Bad Parameter\n");
+
+    }
+
+    /* Set up LIMIT0 to monitor high and low trip points */
+    MXC_ADC_SetMonitorChannel(monitor, chan);
+    MXC_ADC_SetMonitorHighThreshold(monitor, hithresh);
+    MXC_ADC_SetMonitorLowThreshold(monitor, 0);
+    MXC_ADC_EnableMonitor(monitor);
+
+    //NVIC_EnableIRQ(ADC_IRQn);
 }
-#endif
+
+
+
+
+void moistureStartMeasurement(){
+    MXC_TMR_ClearFlags(TAKE_SAMPLE_TIMER);
+    float adcval;
+    if(moistureCount%2 == 0){
+        MXC_GPIO_OutSet(MXC_GPIO0,  MXC_GPIO_PIN_21);
+        MXC_Delay(500000);
+        adcval = MXC_ADC_StartConversion(MOISTURE_READ_1)*(1.22/1024);
+        printf("ADC moisture 1 reading %f: \n", adcval);
+        
+        MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_21);
+    }
+    else{
+        MXC_GPIO_OutSet(MXC_GPIO0, MXC_GPIO_PIN_22);
+        MXC_Delay(500000);
+        adcval = MXC_ADC_StartConversion(MOISTURE_READ_1)*(1.22/1024);
+        printf("ADC moisture 2 reading %f: \n", adcval);
+        
+        MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_22);
+    }
+    moistureCount++;
+    moistureSum+=adcval;
+    moistureAvg = moistureSum/moistureCount;
+    capSensorData[moistureCount-1] = moistureAvg;
+}
+
+
+void rainStartMeasurement(){
+    MXC_TMR_ClearFlags(TAKE_SAMPLE_TIMER);
+    int adcval;
+    printf("Rain Start Conversion \n");
+    fflush(stdout);
+    if(rainCount%2 == 0){
+        adcval = MXC_ADC_StartConversion(RAIN_READ_1);
+        printf("ADC reading %u: \n", adcval);
+    }
+    else{
+        adcval = MXC_ADC_StartConversion(RAIN_READ_2);
+        printf("ADC reading %u: \n", adcval);
+    }
+    rainSensorData[rainCount] = adcval;
+    rainCount++;
+    printf("Rain Count %u: \n", rainCount);
+    if (adcval < RAIN_VOLTAGE_THRESHOLD){
+        rainPeaks++;
+    }
+}
+
+
+void initMoistureRainSystem(){
+    initADC(MXC_ADC_MONITOR_0, MOISTURE_READ_1, 0x1ff); //One ADC channel for moisture, select with GPIO to amps. load switch as well?
+    initADC(MXC_ADC_MONITOR_1, RAIN_READ_1, 0x1ff);
+    initADC(MXC_ADC_MONITOR_2, RAIN_READ_2, 0x1ff); // Two ADC channels for rain, 
+
+    NVIC_EnableIRQ(TMR1_IRQn);
+    //oneshotTimerInitTMR0(SAMPLE_PERIOD_TIMER, 300, TMR_PRES_1024); //~60s
+    PWMTimerInit(PWM_TIMER,30,15,TMR_PRES_8); //~1ms period at 50% duty cycle 20/10 for 50k ~ 37.5k
+
+    printf("Sensor System Initialized \n");
+    fflush(stdout);
+}
+
+void startMoistureSystem(){
+
+    MXC_NVIC_SetVector(TMR1_IRQn, moistureStartMeasurement);
+    MXC_TMR_Start(PWM_TIMER);
+
+    continuousTimerInit(TAKE_SAMPLE_TIMER, 125, TMR_PRES_256, FALSE); //~1s Start of continuous 
+    printf("Start Moisture");
+    fflush(stdout);
+    //capOn = 0;
+
+}
+
+void startRainSystem(){  
+    printf("Start Rain \n");
+    fflush(stdout);
+
+    MXC_NVIC_SetVector(TMR1_IRQn, rainStartMeasurement);
+
+    continuousTimerInit(TAKE_SAMPLE_TIMER, 125, TMR_PRES_256, FALSE); //~1s Start of continuous
+    //rainOn = 0; 
+
+}
+
+int chargeBattery(){
+    printf("Battery Charging");
+    fflush(stdout);
+    openSolenoid();
+    MXC_Delay(60000000);
+    closeSolenoid();
+    return 0;
+}
+//TRUE;
+//FALSE;
+
+int offLoop(){
+    while(1){
+        if(batteryLow){
+            chargeBattery();
+        }
+        else if(manualOn){
+            break;
+        }
+        else if(scheduledTimeOn && !manualOff && !raining && !highMoisture){
+            break;
+        }
+        else if(lowMoisture && !manualOff && !raining){
+            break;
+        }
+    }
+    return 0;
+}
+
+int onLoop(){
+    while(1){
+        if(manualOn){
+            continue;
+        }
+        else if(manualOff || raining || highMoisture || scheduledTimeOff){
+            break;
+        }
+    }
+    return 0;
+}
