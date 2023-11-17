@@ -410,15 +410,19 @@ void moistureStartMeasurement(){
     MXC_TMR_ClearFlags(TAKE_SAMPLE_TIMER);
     if(moistureCount%2 == 0){
         MXC_GPIO_OutSet(MXC_GPIO0,  MXC_GPIO_PIN_21);
+        MXC_Delay(500000);
         float adcval = MXC_ADC_StartConversion(MOISTURE_READ_1)*(1.22/1024);
         printf("ADC moisture 1 reading %f: \n", adcval);
-        //MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_21);
+        
+        MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_21);
     }
     else{
-        //MXC_GPIO_OutSet(MXC_GPIO0, MXC_GPIO_PIN_22);
+        MXC_GPIO_OutSet(MXC_GPIO0, MXC_GPIO_PIN_22);
+        MXC_Delay(500000);
         float adcval = MXC_ADC_StartConversion(MOISTURE_READ_1)*(1.22/1024);
         printf("ADC moisture 2 reading %f: \n", adcval);
-        //MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_22);
+        
+        MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_22);
     }
     moistureCount++;
     moistureAvg+=adcval;
@@ -455,7 +459,7 @@ void initMoistureRainSystem(){
     //NVIC_EnableIRQ(TMR4_IRQn);
     NVIC_EnableIRQ(TMR1_IRQn);
     //oneshotTimerInit(SAMPLE_PERIOD_TIMER, 1875, TMR_PRES_1024); //~60s
-    PWMTimerInit(PWM_TIMER,20,10,TMR_PRES_8); //~1ms period at 50% duty cycle
+    PWMTimerInit(PWM_TIMER,40,20,TMR_PRES_8); //~1ms period at 50% duty cycle 20/10 for 50k
     //continuousTimerInit(TAKE_SAMPLE_TIMER, 2000, TMR_PRES_4096, FALSE); //~1s
     //MXC_TMR_Stop(TAKE_SAMPLE_TIMER);
     //MXC_TMR_SetCount(TAKE_SAMPLE_TIMER,0);
