@@ -301,6 +301,7 @@ void initMoistureRainSystem(){
 }
 
 void startMoistureSystem(){
+    MXC_GPIO_OutSet(MXC_GPIO2,  MXC_GPIO_PIN_6);
 
     MXC_NVIC_SetVector(TMR1_IRQn, moistureStartMeasurement);
     MXC_TMR_Start(PWM_TIMER);
@@ -313,6 +314,8 @@ void startMoistureSystem(){
 }
 
 void startRainSystem(){  
+    MXC_GPIO_OutSet(MXC_GPIO2,  MXC_GPIO_PIN_6);
+
     printf("Start Rain \n");
     fflush(stdout);
 

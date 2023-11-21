@@ -102,7 +102,7 @@ void solenoidInit(){
 
     MXC_NVIC_SetVector(TMR4_IRQn, SolenoidOSTHandler);
     NVIC_EnableIRQ(TMR4_IRQn);
-    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 15,TMR_PRES_64); //30ms on 32k clock 15
+    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 25,TMR_PRES_64); //30ms on 32k clock 15
     //MXC_TMR_Shutdown(SOLENOID_TIMER);
 
     gpio_interrupt_status1.port = MXC_GPIO_PORT_INTERRUPT_STATUS1;
@@ -128,6 +128,8 @@ void GPIOINIT(){
     mxc_gpio_cfg_t gpio_moisture_enable1;
     mxc_gpio_cfg_t gpio_moisture_enable2;
 
+    mxc_gpio_cfg_t gpio_load_enable;
+
     gpio_moisture_enable1.port = MXC_GPIO0;
     gpio_moisture_enable1.mask = MXC_GPIO_PIN_21;
     gpio_moisture_enable1.pad = MXC_GPIO_PAD_NONE;
@@ -141,4 +143,12 @@ void GPIOINIT(){
     gpio_moisture_enable2.func = MXC_GPIO_FUNC_OUT;
     gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
     MXC_GPIO_Config(&gpio_moisture_enable2);
+
+    gpio_moisture_enable2.port = MXC_GPIO2;
+    gpio_moisture_enable2.mask = MXC_GPIO_PIN_6;
+    gpio_moisture_enable2.pad = MXC_GPIO_PAD_NONE;
+    gpio_moisture_enable2.func = MXC_GPIO_FUNC_OUT;
+    gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    MXC_GPIO_Config(&gpio_load_enable);
+
 }

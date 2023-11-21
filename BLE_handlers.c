@@ -117,6 +117,7 @@ void onSensorSet( uint8_t *pValue){
         //printf("rainOff: %u \n", rainOn);
         //fflush(stdout);
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
+        MXC_GPIO_OutClr(MXC_GPIO2,  MXC_GPIO_PIN_6);
         break;
 
         case 3: //cap On
@@ -132,6 +133,7 @@ void onSensorSet( uint8_t *pValue){
         //fflush(stdout);
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
         MXC_TMR_Stop(PWM_TIMER);
+        MXC_GPIO_OutClr(MXC_GPIO2,  MXC_GPIO_PIN_6);
         break;
     }
 }

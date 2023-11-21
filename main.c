@@ -252,6 +252,11 @@ int main(void)
     initMoistureRainSystem();
 
     while(1){
+        
+    }
+
+
+    while(1){
         offLoop();
         McsSetFeatures(1);
         printf("Exit Off Loop");
