@@ -54,7 +54,7 @@
 #define CONT_CLOCK_SOURCE MXC_TMR_8M_CLK // \ref mxc_tmr_clock_t
 
 // Parameters for Continuous timer
-#define OST_FREQ 20 // (Hz)
+#define OST_FREQ 14 // (Hz)
 #define OST_TIMER1 MXC_TMR4 // Can be MXC_TMR0 through MXC_TMR5
 #define OST_TIMER2 MXC_TMR5
 #define BOARD_FTHR_APPS_P1
@@ -71,10 +71,10 @@
 #define MXC_GPIO_PORT_INTERRUPT_IN2 MXC_GPIO0
 #define MXC_GPIO_PIN_INTERRUPT_IN2 MXC_GPIO_PIN_2
 
-#define MXC_GPIO_PORT_INTERRUPT_STATUS1 MXC_GPIO2
-#define MXC_GPIO_PIN_INTERRUPT_STATUS1 MXC_GPIO_PIN_4//31
-#define MXC_GPIO_PORT_INTERRUPT_STATUS2 MXC_GPIO0
-#define MXC_GPIO_PIN_INTERRUPT_STATUS2 MXC_GPIO_PIN_5//30
+#define MXC_GPIO_PORT_INTERRUPT_STATUS1 MXC_GPIO1
+#define MXC_GPIO_PIN_INTERRUPT_STATUS1 MXC_GPIO_PIN_9//31
+#define MXC_GPIO_PORT_INTERRUPT_STATUS2 MXC_GPIO1
+#define MXC_GPIO_PIN_INTERRUPT_STATUS2 MXC_GPIO_PIN_8//30
 
 #define BUTTON1_Pin 2
 #define BUTTON2_Pin 3
@@ -114,7 +114,8 @@ void gpio_isr1(void *cbdata)
 void gpio_isr2(void *cbdata)
 {
     mxc_gpio_cfg_t *cfg = cbdata;
-    MXC_GPIO_OutToggle(cfg->port, cfg->mask);
+        MXC_GPIO_OutToggle( MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
+   // MXC_GPIO_OutToggle(cfg->port, cfg->mask);
     MXC_TMR_Start(OST_TIMER1);
     printf("turned back on2!\n");
     pin = 2;
@@ -206,7 +207,8 @@ int main(void)
     MXC_GPIO_Config(&gpio_interrupt_status2);
 
 
-    MXC_GPIO_OutClr( MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
+    MXC_GPIO_OutSet( MXC_GPIO_PORT_INTERRUPT_STATUS1,  MXC_GPIO_PIN_INTERRUPT_STATUS1);
+    MXC_GPIO_OutToggle( MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
     
     /*
      *   Set up interrupt on P0.18.
