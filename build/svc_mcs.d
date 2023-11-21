@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/svc_mcs.o: \
+C:/MaximSDK/Examples/MAX32655/PeterBluetoothtest/BLE_mcs_sprinkler_profile/build/svc_mcs.o: \
  services/svc_mcs.c services/svc_mcs.h \
  C:/MaximSDK/Libraries/Cordio/wsf/include/wsf_types.h \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdint.h \

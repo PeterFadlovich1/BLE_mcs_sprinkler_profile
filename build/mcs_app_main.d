@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/mcs_app_main.o: \
+C:/MaximSDK/Examples/MAX32655/PeterBluetoothtest/BLE_mcs_sprinkler_profile/build/mcs_app_main.o: \
  mcs_app_main.c \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\string.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\_ansi.h \

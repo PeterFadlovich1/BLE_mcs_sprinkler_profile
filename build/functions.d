@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/functions.o: \
+C:/MaximSDK/Examples/MAX32655/PeterBluetoothtest/BLE_mcs_sprinkler_profile/build/functions.o: \
  functions.c C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/tmr.h \
  C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/mxc_device.h \
  C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/max32655.h \

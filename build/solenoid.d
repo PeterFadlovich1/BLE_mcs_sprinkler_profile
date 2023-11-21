@@ -1,4 +1,4 @@
-C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/solenoid.o: \
+C:/MaximSDK/Examples/MAX32655/PeterBluetoothtest/BLE_mcs_sprinkler_profile/build/solenoid.o: \
  solenoid.c C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/lp.h \
  c:\maximsdk\tools\gnutools\10.3\lib\gcc\arm-none-eabi\10.3.1\include\stdint.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\stdint.h \

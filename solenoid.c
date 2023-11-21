@@ -144,11 +144,11 @@ void GPIOINIT(){
     gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
     MXC_GPIO_Config(&gpio_moisture_enable2);
 
-    gpio_moisture_enable2.port = MXC_GPIO2;
-    gpio_moisture_enable2.mask = MXC_GPIO_PIN_6;
-    gpio_moisture_enable2.pad = MXC_GPIO_PAD_NONE;
-    gpio_moisture_enable2.func = MXC_GPIO_FUNC_OUT;
-    gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    gpio_load_enable.port = MXC_GPIO2;
+    gpio_load_enable.mask = MXC_GPIO_PIN_6;
+    gpio_load_enable.pad = MXC_GPIO_PAD_NONE;
+    gpio_load_enable.func = MXC_GPIO_FUNC_OUT;
+    gpio_load_enable.vssel = MXC_GPIO_VSSEL_VDDIOH;
     MXC_GPIO_Config(&gpio_load_enable);
 
 }
