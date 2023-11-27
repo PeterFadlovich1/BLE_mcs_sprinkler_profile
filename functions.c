@@ -271,12 +271,12 @@ void rainStartMeasurement(){
     printf("Rain Start Conversion \n");
     fflush(stdout);
     if(rainCount%2 == 0){
-        adcval = MXC_ADC_StartConversion(RAIN_READ_1);
-        printf("ADC reading %u: \n", adcval);
+        adcval = MXC_ADC_StartConversion(RAIN_READ_1)*(1.22/1024);
+        printf("ADC reading %f: \n", adcval);
     }
     else{
-        adcval = MXC_ADC_StartConversion(RAIN_READ_2);
-        printf("ADC reading %u: \n", adcval);
+        adcval = MXC_ADC_StartConversion(RAIN_READ_2)*(1.22/1024);
+        printf("ADC reading %f: \n", adcval);
     }
     rainSensorData[rainCount] = adcval;
     rainCount++;

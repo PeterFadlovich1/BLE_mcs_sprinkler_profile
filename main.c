@@ -238,7 +238,7 @@ int main(void)
     StackInitMcsApp();
     McsAppStart();
 
-    bluetoothInterruptInit();
+    //bluetoothInterruptInit();
 
     NVIC_SetPriority(TMR2_IRQn,0); //BLE highest priority
     //NVIC_SetPriority(TMR4_IRQn,1);
@@ -252,9 +252,9 @@ int main(void)
     initMoistureRainSystem();
 
     while(1){
-        
-    }
 
+    }
+    
 
     while(1){
         offLoop();

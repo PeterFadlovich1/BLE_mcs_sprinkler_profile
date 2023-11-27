@@ -88,7 +88,13 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
     fflush(stdout);
     for (i = 0; i < len; i++){
         //printf("pValue test: %u \n \n", *(pValue + i));
-        scheduleTimeArray[i] = timeConverter(*(pValue + i));
+        if(i<4){
+            scheduleTimeArray[i] = timeConverter(*(pValue + i));
+        }
+        else{
+            scheduleTimeArray[i] = *(pValue + i);
+        }
+        
         printf("Array test: %u \n", scheduleTimeArray[i]);
     }
     fflush(stdout);

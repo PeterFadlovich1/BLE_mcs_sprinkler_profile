@@ -106,7 +106,7 @@ static const uint16_t mcsGValLen = sizeof(mcsGVal);
 static uint8_t mcsBVal[] = { 0 };
 static const uint16_t mcsBValLen = sizeof(mcsBVal);
 
-static uint8_t mcsXVal[4] = { 0 , 0 , 0 , 0 };
+static uint8_t mcsXVal[6] = { 0 , 0 , 0 , 0 , 0, 0};
 static const uint16_t mcsXValLen = sizeof(mcsXVal);
 
 static uint8_t mcsCancelTimer[] = { 0 };
