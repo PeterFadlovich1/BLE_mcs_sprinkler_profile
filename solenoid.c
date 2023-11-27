@@ -93,6 +93,11 @@ void SolenoidOSTHandler(void)
     }
 }
 
+#define MXC_GPIO_PORT_INTERRUPT_IN1 MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_IN1 MXC_GPIO_PIN_3
+
+#define MXC_GPIO_PORT_INTERRUPT_IN2 MXC_GPIO0
+#define MXC_GPIO_PIN_INTERRUPT_IN2 MXC_GPIO_PIN_2
 
 
 void solenoidInit(){
@@ -102,7 +107,7 @@ void solenoidInit(){
 
     MXC_NVIC_SetVector(TMR4_IRQn, SolenoidOSTHandler);
     NVIC_EnableIRQ(TMR4_IRQn);
-    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 25,TMR_PRES_64); //30ms on 32k clock 15
+    oneshotTimerInit8kTimer5(SOLENOID_TIMER, 25,TMR_PRES_64); //30ms on 32k clock 15 50ms ~ 25
     //MXC_TMR_Shutdown(SOLENOID_TIMER);
 
     gpio_interrupt_status1.port = MXC_GPIO_PORT_INTERRUPT_STATUS1;
@@ -121,8 +126,38 @@ void solenoidInit(){
     MXC_GPIO_Config(&gpio_interrupt_status2);
 
     MXC_GPIO_OutClr(MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
+    
+//
+    MXC_GPIO_OutToggle( MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
 
+    mxc_gpio_cfg_t gpio_interrupt1;
+    mxc_gpio_cfg_t gpio_interrupt2;
+
+    gpio_interrupt1.port = MXC_GPIO_PORT_INTERRUPT_IN1;
+    gpio_interrupt1.mask = MXC_GPIO_PIN_INTERRUPT_IN1;
+    gpio_interrupt1.pad = MXC_GPIO_PAD_PULL_UP;
+    gpio_interrupt1.func = MXC_GPIO_FUNC_IN;
+    gpio_interrupt1.vssel = MXC_GPIO_VSSEL_VDDIO;
+    MXC_GPIO_Config(&gpio_interrupt1);
+    MXC_GPIO_RegisterCallback(&gpio_interrupt1, openSolenoid, &gpio_interrupt_status1);
+    MXC_GPIO_IntConfig(&gpio_interrupt1, MXC_GPIO_INT_FALLING);
+    MXC_GPIO_EnableInt(gpio_interrupt1.port, gpio_interrupt1.mask);
+    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(MXC_GPIO_GET_IDX(MXC_GPIO_PORT_INTERRUPT_IN1)));
+
+    gpio_interrupt2.port = MXC_GPIO_PORT_INTERRUPT_IN2;
+    gpio_interrupt2.mask = MXC_GPIO_PIN_INTERRUPT_IN2;
+    gpio_interrupt2.pad = MXC_GPIO_PAD_PULL_UP;
+    gpio_interrupt2.func = MXC_GPIO_FUNC_IN;
+    gpio_interrupt2.vssel = MXC_GPIO_VSSEL_VDDIO;
+    MXC_GPIO_Config(&gpio_interrupt2);
+    MXC_GPIO_RegisterCallback(&gpio_interrupt2, closeSolenoid, &gpio_interrupt_status2);
+    MXC_GPIO_IntConfig(&gpio_interrupt2, MXC_GPIO_INT_FALLING);
+    MXC_GPIO_EnableInt(gpio_interrupt2.port, gpio_interrupt2.mask);
+    NVIC_EnableIRQ(MXC_GPIO_GET_IRQ(MXC_GPIO_GET_IDX(MXC_GPIO_PORT_INTERRUPT_IN2)));
+
+    MXC_GPIO_OutClr(MXC_GPIO_PORT_INTERRUPT_STATUS2,  MXC_GPIO_PIN_INTERRUPT_STATUS2);
 }
+
 
 void GPIOINIT(){
     mxc_gpio_cfg_t gpio_moisture_enable1;
@@ -144,11 +179,12 @@ void GPIOINIT(){
     gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
     MXC_GPIO_Config(&gpio_moisture_enable2);
 
-    gpio_moisture_enable2.port = MXC_GPIO2;
-    gpio_moisture_enable2.mask = MXC_GPIO_PIN_6;
-    gpio_moisture_enable2.pad = MXC_GPIO_PAD_NONE;
-    gpio_moisture_enable2.func = MXC_GPIO_FUNC_OUT;
-    gpio_moisture_enable2.vssel = MXC_GPIO_VSSEL_VDDIOH;
+    gpio_load_enable.port = MXC_GPIO2;
+    gpio_load_enable.mask = MXC_GPIO_PIN_6;
+    gpio_load_enable.pad = MXC_GPIO_PAD_NONE;
+    gpio_load_enable.func = MXC_GPIO_FUNC_OUT;
+    gpio_load_enable.vssel = MXC_GPIO_VSSEL_VDDIOH;
     MXC_GPIO_Config(&gpio_load_enable);
+
 
 }
