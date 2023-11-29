@@ -86,12 +86,12 @@ enum {
     MCS_SENSOR_HDL, /*!< \brief G*/
     MCS_ROOT_CH_HDL, /*!< \brief B characteristic */
     MCS_ROOT_HDL, /*!< \brief B*/
-    MCS_SCHEDULE_CH_HDL, /*!< \brief B characteristic */
-    MCS_SCHEDULE_HDL, /*!< \brief B*/
-    MCS_CANCEL_TIMER_CH_HDL,
-    MCS_CANCEL_TIMER_HDL,
-    MCS_ON_RAIN_CH_HDL,
-    MCS_ON_RAIN_HDL, 
+    MCS_SCHEDULE_CH_HDL, /*!< \brief x characteristic */
+    MCS_SCHEDULE_HDL, /*!< \brief x*/
+    MCS_DATA_CH_HDL,
+    MCS_DATA_HDL,
+    MCS_REQUEST_DATA_CH_HDL,
+    MCS_REQUEST_DATA_HDL, 
     //MCS_ON_CAP_CH_HDL,
     //MCS_ON_CAP_HDL,  
     MCS_MAX_HDL /*!< \brief Maximum handle. */

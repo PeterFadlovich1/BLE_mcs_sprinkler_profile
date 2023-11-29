@@ -5,6 +5,10 @@
 #include "tmr.h"
 #include "solenoid_fun.h"
 #include "functions.h"
+#include "rtc.h"
+#include "mxc_delay.h"
+#include "nvic_table.h"
+
 #define MANUAL_TIMER MXC_TMR4
 #define TAKE_SAMPLE_TIMER MXC_TMR1
 #define PWM_TIMER MXC_TMR3
@@ -14,9 +18,17 @@ extern int manualOff;
 extern int manualOn;
 extern int manualTime;
 extern int rootDepth;
-extern int scheduleTimeArray[8];
+extern int scheduleTimeArray[6];
+extern int currentRealTimeSec;
+extern int nextTimeIndex;
 extern int rainOn;
 extern int capOn;
+extern int scheduledTimeOn;
+extern int scheduledTimeOff;
+
+extern uint8_t capSensorData[512];
+extern uint8_t rainSensorData[512];
+
 
 void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 {
@@ -33,7 +45,7 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             //MXC_TMR_Start(MANUAL_TIMER);
 
 
-            openSolenoid();
+            //openSolenoid();
 
             printf("Manual On \n");
             fflush(stdout);
@@ -47,13 +59,13 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             //MXC_TMR_Shutdown(MANUAL_TIMER);
             //MXC_TMR_Start(MANUAL_TIMER);
 
-            closeSolenoid();
+            //closeSolenoid();
 
             printf("Manual Off \n");
             fflush(stdout);
 
             break;
-        case 3:  //Cancel Timer
+        case 3:  //Cancel Timer     app sends 3 when app side timer expires and resets micro timer
             manualOn = 0;
             manualOff = 0;
             manualTime = 0;
@@ -75,8 +87,8 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 }
 
 int timeConverter(uint8_t time){
-    int hour = (time/4)*100; 
-    int minute = (time%4)*15;
+    int hour = (time/4)*3600; 
+    int minute = (time%4)*15; //add back in the *60
     return hour+minute;
 
 }
@@ -97,7 +109,61 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
         
         printf("Array test: %u \n", scheduleTimeArray[i]);
     }
+    currentRealTimeSec = scheduleTimeArray[len-2]*3600+scheduleTimeArray[len-1];//add back in the *60
+    printf("real time: %u \n", currentRealTimeSec);
     fflush(stdout);
+
+    //RTC initialization
+    int j = 0;
+    for (j = 0; j < len-2; j++){
+        if(scheduleTimeArray[j]>currentRealTimeSec){
+            nextTimeIndex = j;
+            break;
+        }
+    }
+    if(nextTimeIndex%2 != 0){
+        scheduledTimeOn = 1;
+        scheduledTimeOff = 0;
+    }
+    else{
+        scheduledTimeOn = 0;
+        scheduledTimeOff = 1;
+    }
+    printf("next time index: %u \n", nextTimeIndex);
+    printf("In schedule?: %u \n", scheduledTimeOn);
+    fflush(stdout);
+
+    if (MXC_RTC_Init(currentRealTimeSec, 0) != E_NO_ERROR) {
+        printf("Failed RTC Initialization\n");
+        printf("Example Failed\n");
+        fflush(stdout);
+
+        while (1) {}
+    }
+
+    if (MXC_RTC_Start() != E_NO_ERROR) {
+        printf("Failed RTC_Start\n");
+        printf("Example Failed\n");
+
+        while (1) {}
+    }
+
+
+    
+    MXC_NVIC_SetVector(RTC_IRQn, scheduleRTCHandler);
+
+    NVIC_EnableIRQ(RTC_IRQn);
+
+
+
+    if (MXC_RTC_SetTimeofdayAlarm(scheduleTimeArray[nextTimeIndex]) != E_NO_ERROR) {
+            /* Handle Error */
+    }
+
+    while (MXC_RTC_EnableInt(MXC_F_RTC_CTRL_TOD_ALARM_IE) == E_BUSY) {}
+
+
+
 }
 
 void rootDepthHandler( uint8_t *pValue)
@@ -142,4 +208,39 @@ void onSensorSet( uint8_t *pValue){
         MXC_GPIO_OutClr(MXC_GPIO2,  MXC_GPIO_PIN_6);
         break;
     }
+}
+
+/*
+Configure one characteristic to take an integer that determines what data is loaded into the second characteristic
+
+Second characteristic would essentially be read only
+*/
+void loadData(uint8_t *pValue){
+    //uint8_t testArray[512];
+
+    switch(*pValue){
+        case 1: //Rain Data
+
+        AttsSetAttr(MCS_DATA_HDL, 512, rainSensorData);
+
+        break;
+        case 2: //Cap Data
+
+        AttsSetAttr(MCS_DATA_HDL, 512, capSensorData);
+        
+        break;
+    }
+
+}
+
+//10 bit samples but 8 bit int transmission?
+
+uint8_t testArray[512];
+void requestData(){
+    int i = 0;
+    for(i = 0; i <512; i++){
+        testArray[i] = 100;
+    }
+
+    AttsSetAttr(MCS_DATA_HDL, 512, testArray);
 }

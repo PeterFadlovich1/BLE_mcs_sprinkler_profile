@@ -171,7 +171,7 @@ uint8_t McsWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uin
     case MCS_ROOT_HDL:
     
         rootDepthHandler(pValue);
-
+        //requestData();
 
         break;
     case MCS_SCHEDULE_HDL:
@@ -181,6 +181,12 @@ uint8_t McsWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uin
         scheduleArrayHandler(len, (uint8_t *)pValue);
 
         break;
+    case MCS_REQUEST_DATA_HDL:
+
+        loadData((uint8_t *)pValue);
+
+        break;
+
     }
     return ATT_SUCCESS;
 }

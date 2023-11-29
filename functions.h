@@ -29,6 +29,8 @@ void startRainSystem();
 
 int chargeBattery();
 
+void scheduleRTCHandler();
+
 void offLoop();
 
 void onLoop();

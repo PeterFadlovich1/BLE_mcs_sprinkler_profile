@@ -101,7 +101,9 @@
         "mcs_app_api.h": "c",
         "cstdio": "c",
         "tmr_common.h": "c",
-        "wsf_os.h": "c"
+        "wsf_os.h": "c",
+        "mxc_delay.h": "c",
+        "rtc.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

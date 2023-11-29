@@ -61,6 +61,8 @@ C:/MaximSDK/Examples/MAX32655/BLE_mcs_sprinkler_profile/build/functions.o: \
  C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/lpcmp.h \
  C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/lpcmp_regs.h \
  C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/tmr.h \
+ C:/MaximSDK/Libraries/PeriphDrivers/Include/MAX32655/rtc.h \
+ C:/MaximSDK/Libraries/CMSIS/Device/Maxim/MAX32655/Include/rtc_regs.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\string.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\sys\_locale.h \
  c:\maximsdk\tools\gnutools\10.3\arm-none-eabi\include\strings.h \

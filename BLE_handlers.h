@@ -17,7 +17,11 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue);
 
 void rootDepthHandler(uint8_t *pValue);
 
+void onSensorSet( uint8_t *pValue);
 
+void loadData(uint8_t *pValue);
+
+void requestData();
 
 
 
