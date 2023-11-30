@@ -90,8 +90,8 @@ enum {
     MCS_SCHEDULE_HDL, /*!< \brief x*/
     MCS_DATA_CH_HDL,
     MCS_DATA_HDL,
-    MCS_REQUEST_DATA_CH_HDL,
-    MCS_REQUEST_DATA_HDL, 
+    MCS_STATE_DATA_CH_HDL,
+    MCS_STATE_DATA_HDL, 
     //MCS_ON_CAP_CH_HDL,
     //MCS_ON_CAP_HDL,  
     MCS_MAX_HDL /*!< \brief Maximum handle. */

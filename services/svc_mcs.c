@@ -78,7 +78,7 @@ static const uint8_t mcsCancelTimerCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT
                                      ATT_UUID_MCS_CANCEL_TIMER };
 static const uint16_t mcsCancelTimerLenCh = sizeof(mcsCancelTimerCh);
 
-static const uint8_t mcsOnRainCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_REQUEST_DATA_HDL),
+static const uint8_t mcsOnRainCh[] = { ATT_PROP_READ | ATT_PROP_WRITE, UINT16_TO_BYTES(MCS_STATE_DATA_HDL),
                                      ATT_UUID_MCS_ON_RAIN };
 static const uint16_t mcsOnRainLenCh = sizeof(mcsOnRainCh);
 
@@ -109,10 +109,10 @@ static const uint16_t mcsBValLen = sizeof(mcsBVal);
 static uint8_t mcsXVal[6] = { 0 , 0 , 0 , 0 , 0, 0};
 static const uint16_t mcsXValLen = sizeof(mcsXVal);
 
-static uint8_t mcsCancelTimer[512] = { };
+static uint8_t mcsCancelTimer[64] = { };
 static const uint16_t mcsCancelTimerLen = sizeof(mcsCancelTimer);
 
-static uint8_t mcsOnRain[] = {0};
+static uint8_t mcsOnRain[64] = { };
 static const uint16_t mcsOnRainLen = sizeof(mcsOnRain);
 
 #if 0

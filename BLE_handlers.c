@@ -26,8 +26,8 @@ extern int capOn;
 extern int scheduledTimeOn;
 extern int scheduledTimeOff;
 
-extern uint8_t capSensorData[512];
-extern uint8_t rainSensorData[512];
+extern uint8_t capSensorData[64];
+extern uint8_t rainSensorData[64];
 
 
 void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
@@ -189,6 +189,7 @@ void onSensorSet( uint8_t *pValue){
         //printf("rainOff: %u \n", rainOn);
         //fflush(stdout);
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
+        rainEnd();
         MXC_GPIO_OutClr(MXC_GPIO2,  MXC_GPIO_PIN_6);
         break;
 
@@ -205,28 +206,30 @@ void onSensorSet( uint8_t *pValue){
         //fflush(stdout);
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
         MXC_TMR_Stop(PWM_TIMER);
+        capEnd();
         MXC_GPIO_OutClr(MXC_GPIO2,  MXC_GPIO_PIN_6);
         break;
     }
 }
 
-/*
-Configure one characteristic to take an integer that determines what data is loaded into the second characteristic
 
-Second characteristic would essentially be read only
-*/
+
+
 void loadData(uint8_t *pValue){
     //uint8_t testArray[512];
-
     switch(*pValue){
         case 1: //Rain Data
+        printf("Case 1: %u", *pValue);
+        printf("\n");
+        fflush(stdout);
 
-        AttsSetAttr(MCS_DATA_HDL, 512, rainSensorData);
+
+        AttsSetAttr(MCS_DATA_HDL, 64, rainSensorData);
 
         break;
         case 2: //Cap Data
 
-        AttsSetAttr(MCS_DATA_HDL, 512, capSensorData);
+        AttsSetAttr(MCS_DATA_HDL, 64, capSensorData);
         
         break;
     }

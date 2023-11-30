@@ -169,9 +169,8 @@ uint8_t McsWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uin
 
         break;
     case MCS_ROOT_HDL:
-    
+
         rootDepthHandler(pValue);
-        //requestData();
 
         break;
     case MCS_SCHEDULE_HDL:
@@ -181,9 +180,12 @@ uint8_t McsWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uin
         scheduleArrayHandler(len, (uint8_t *)pValue);
 
         break;
-    case MCS_REQUEST_DATA_HDL:
+    case MCS_DATA_HDL:
+        printf("shoutout \n");
+        printf("Pvalue: %u \n", (uint8_t *)pValue);
+        fflush(stdout);
 
-        loadData((uint8_t *)pValue);
+        loadData(pValue);
 
         break;
 

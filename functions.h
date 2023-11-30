@@ -19,7 +19,11 @@ void initADC(mxc_adc_monitor_t monitor, mxc_adc_chsel_t chan, uint16_t hithresh)
 
 void moistureStartMeasurement();
 
+void capEnd();
+
 void rainStartMeasurement();
+
+void rainEnd();
 
 void initMoistureRainSystem();
 
@@ -30,6 +34,8 @@ void startRainSystem();
 int chargeBattery();
 
 void scheduleRTCHandler();
+
+void storeStateChange();
 
 void offLoop();
 

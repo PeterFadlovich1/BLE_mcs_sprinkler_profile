@@ -254,10 +254,12 @@ int main(void)
     while(1){
         offLoop();
         McsSetFeatures(1);
+        //storeStateChange();
         printf("Exit Off Loop");
         fflush(stdout);
         onLoop();
         McsSetFeatures(0);
+        //storeStateChange();
         printf("Exit On Loop");
         fflush(stdout);
     }

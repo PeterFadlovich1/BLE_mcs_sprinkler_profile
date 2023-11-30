@@ -65,7 +65,7 @@ void openSolenoid()
     MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS2, MXC_GPIO_PIN_INTERRUPT_STATUS2);
     MXC_TMR_Start(SOLENOID_TIMER);
     //oneshotTimerInit8kTimer5(SOLENOID_TIMER, 15,TMR_PRES_64);
-    printf("turned back on1!\n");
+    printf("Open Solenoid!\n");
     pin = 1;
 }
 
@@ -74,7 +74,7 @@ void closeSolenoid()
     MXC_GPIO_OutToggle(MXC_GPIO_PORT_INTERRUPT_STATUS1, MXC_GPIO_PIN_INTERRUPT_STATUS1);
     MXC_TMR_Start(SOLENOID_TIMER);
     //oneshotTimerInit8kTimer5(SOLENOID_TIMER, 15,TMR_PRES_64);
-    printf("turned back on2!\n");
+    printf("Close Solenoid!\n");
     pin = 2;
 }
 
