@@ -33,15 +33,15 @@
 
 
 #define MOISTURE_READ_1 MXC_ADC_CH_0
-#define RAIN_READ_1 MXC_ADC_CH_1
+#define RAIN_READ_1 MXC_ADC_CH_0 //1
 #define RAIN_READ_2 MXC_ADC_CH_2
 
 
-#define RAIN_VOLTAGE_THRESHOLD 0x1ff
-#define RAIN_PEAK_THRESHOLD 0x1ff
+#define RAIN_VOLTAGE_THRESHOLD 350
+#define RAIN_PEAK_THRESHOLD 3
 
-#define LOW_MOISTURE_THRESHOLD 0x1ff
-#define HIGH_MOISTURE_THRESHOLD 0x1ff
+#define LOW_MOISTURE_THRESHOLD 754 
+#define HIGH_MOISTURE_THRESHOLD 511
 
 
 
@@ -335,6 +335,9 @@ void rainStartMeasurement(){
     int adcval;
     printf("Rain Start Conversion \n");
     fflush(stdout);
+    adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
+    printf("ADC reading %f: \n", adcval*(1.22/1024));
+    #if 0
     if(rainCount%2 == 0){
         adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
         printf("ADC reading %f: \n", adcval*(1.22/1024));
@@ -343,11 +346,14 @@ void rainStartMeasurement(){
         adcval = MXC_ADC_StartConversion(RAIN_READ_2);//*(1.22/1024);
         printf("ADC reading %f: \n", adcval*(1.22/1024));
     }
+    #endif
     //rainSensorData[rainCount] = (uint8_t) (adcval >> 2);
     rainCount++;
     printf("Rain Count %u: \n", rainCount);
     if (adcval < RAIN_VOLTAGE_THRESHOLD){
         rainPeaks++;
+        printf("Peak count %u: \n",rainPeaks);
+        fflush(stdout);
     }
     //# of rainPeaks needed to flip raining variable?
     //Stop sampling when raining is detected?
@@ -356,16 +362,23 @@ void rainStartMeasurement(){
 
 
 void rainEnd(){
+    int rainPercent = 0;
+    rainPercent = rainPeaks/rainCount;
+
     rainSensorData[rainStorageCount] = rainPeaks;
     rainStorageCount++;
 
     if(rainPeaks > RAIN_PEAK_THRESHOLD){
         raining = 1;
+        printf("Raining Triggered, latest peak count: %u", rainSensorData[rainStorageCount-1]);
+        fflush(stdout);
+        //AttsSetAttr(MCS_DATA_HDL, 64, rainSensorData);
+
     }
     else{
         raining = 0;
     }
-
+    rainCount = 0;
     rainPeaks = 0;
 }
 
@@ -378,7 +391,7 @@ void initMoistureRainSystem(){
 
     NVIC_EnableIRQ(TMR1_IRQn);
     //oneshotTimerInitTMR0(SAMPLE_PERIOD_TIMER, 300, TMR_PRES_1024); //~60s
-    PWMTimerInit(PWM_TIMER,30,15,TMR_PRES_8); //~1ms period at 50% duty cycle 20/10 for 50k ~ 37.5k
+    PWMTimerInit(PWM_TIMER,30,15,TMR_PRES_8); //~1ms period at 50% duty cycle 20/10 for 50k ~ 37.5k 30/15
 
     printf("Sensor System Initialized \n");
     fflush(stdout);
@@ -390,7 +403,7 @@ void startMoistureSystem(){
     MXC_NVIC_SetVector(TMR1_IRQn, moistureStartMeasurement);
     MXC_TMR_Start(PWM_TIMER);
 
-    continuousTimerInit(TAKE_SAMPLE_TIMER, 125, TMR_PRES_256, FALSE); //~1s Start of continuous 
+    continuousTimerInit(TAKE_SAMPLE_TIMER, 125, TMR_PRES_256, FALSE); //~1s Start of continuous ~ 125
     printf("Start Moisture");
     fflush(stdout);
     //capOn = 0;

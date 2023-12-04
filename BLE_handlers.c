@@ -188,6 +188,8 @@ void onSensorSet( uint8_t *pValue){
         //rainOn = 0;
         //printf("rainOff: %u \n", rainOn);
         //fflush(stdout);
+
+        //ADD a check for if the sensor is currently sampling
         MXC_TMR_Shutdown(TAKE_SAMPLE_TIMER);
         rainEnd();
         MXC_GPIO_OutClr(MXC_GPIO2,  MXC_GPIO_PIN_6);
@@ -222,11 +224,15 @@ void loadData(uint8_t *pValue){
         printf("Case 1: %u", *pValue);
         printf("\n");
         fflush(stdout);
-
-
+        
         AttsSetAttr(MCS_DATA_HDL, 64, rainSensorData);
+        for(int x = 0; x<10;x++){
+            printf("Rain Data %u \n", rainSensorData[x]);
+            fflush(stdout);
+        }
 
         break;
+
         case 2: //Cap Data
 
         AttsSetAttr(MCS_DATA_HDL, 64, capSensorData);
@@ -238,12 +244,12 @@ void loadData(uint8_t *pValue){
 
 //10 bit samples but 8 bit int transmission?
 
-uint8_t testArray[512];
+uint8_t testArray[64];
 void requestData(){
     int i = 0;
-    for(i = 0; i <512; i++){
+    for(i = 0; i <64; i++){
         testArray[i] = 100;
     }
 
-    AttsSetAttr(MCS_DATA_HDL, 512, testArray);
+    AttsSetAttr(MCS_DATA_HDL, 64, testArray);
 }
