@@ -88,7 +88,7 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
 
 int timeConverter(uint8_t time){
     int hour = (time/4)*3600; 
-    int minute = (time%4)*15; //add back in the *60
+    int minute = (time%4)*15*60; //add back in the *60
     return hour+minute;
 
 }
@@ -109,7 +109,7 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
         
         printf("Array test: %u \n", scheduleTimeArray[i]);
     }
-    currentRealTimeSec = scheduleTimeArray[len-2]*3600+scheduleTimeArray[len-1];//add back in the *60
+    currentRealTimeSec = scheduleTimeArray[len-2]*3600+scheduleTimeArray[len-1]*60;//add back in the *60
     printf("real time: %u \n", currentRealTimeSec);
     fflush(stdout);
 

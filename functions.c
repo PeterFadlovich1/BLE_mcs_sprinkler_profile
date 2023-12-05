@@ -32,9 +32,9 @@
 #define TAKE_SAMPLE_TIMER MXC_TMR1
 
 
-#define MOISTURE_READ_1 MXC_ADC_CH_0
+#define MOISTURE_READ_1 MXC_ADC_CH_2
 #define RAIN_READ_1 MXC_ADC_CH_0 //1
-#define RAIN_READ_2 MXC_ADC_CH_2
+#define RAIN_READ_2 MXC_ADC_CH_1
 
 
 #define RAIN_VOLTAGE_THRESHOLD 350
@@ -312,13 +312,13 @@ void capEnd(){
     capSensorData[capStorageCount] = (uint8_t)  (moistureAvg / 4);
     capStorageCount++;
 
-    if (moistureAvg > HIGH_MOISTURE_THRESHOLD){
-        highMoisture = 1;
-        lowMoisture = 0;
-    }
-    else if (moistureAvg < LOW_MOISTURE_THRESHOLD){
+    if (moistureAvg > LOW_MOISTURE_THRESHOLD){
         highMoisture = 0;
         lowMoisture = 1;
+    }
+    else if (moistureAvg < HIGH_MOISTURE_THRESHOLD){
+        highMoisture = 1;
+        lowMoisture = 0;
     }
     else{
         highMoisture = 0;
@@ -504,8 +504,8 @@ void storeStateChange(){
 
 
 
-//TRUE;
-//FALSE;
+TRUE;
+FALSE;
 
 int offLoop(){
     while(1){
@@ -528,9 +528,9 @@ int offLoop(){
 
 int onLoop(){
     while(1){
-        if(manualOn){
+        if(manualOn || lowMoisture){
             continue;
-        }
+        }//scheduleTimeOff triggered even when a low moisture condition was met. oscillated between loops 
         else if(manualOff || raining || highMoisture || scheduledTimeOff){
             break;
         }
