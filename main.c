@@ -241,11 +241,12 @@ int main(void)
     bluetoothInterruptInit();
 
     NVIC_SetPriority(TMR2_IRQn,0); //BLE highest priority
+    NVIC_SetPriority(TMR4_IRQn,1);
+    NVIC_SetPriority(TMR1_IRQn,2);
+    NVIC_SetPriority(RTC_IRQn,3);
     //NVIC_SetPriority(TMR4_IRQn,1);
 
     GPIOINIT();
-
-    //manualInterruptInit();
 
     solenoidInit();
 
@@ -255,12 +256,12 @@ int main(void)
         offLoop();
         McsSetFeatures(1);
         //storeStateChange();
-        printf("Exit Off Loop");
+        printf("TURN ON \n");
         fflush(stdout);
         onLoop();
         McsSetFeatures(0);
         //storeStateChange();
-        printf("Exit On Loop");
+        printf("TURN OFF \n");
         fflush(stdout);
     }
 

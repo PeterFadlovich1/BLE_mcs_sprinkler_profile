@@ -73,8 +73,9 @@ void manualOnOffHandler(uint16_t handle, uint8_t *pValue)
             //MXC_TMR_SetCount(MANUAL_TIMER,0);
             //MXC_TMR_ClearFlags(MANUAL_TIMER);
 
-            printf("Cancel Timer \n");
+            printf("Cancel Timer and Clear Decision Making Variables \n");
             fflush(stdout);
+            resetDecisionVariables();
 
             break;
     }
@@ -96,8 +97,6 @@ int timeConverter(uint8_t time){
 void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
 {
     int i = 0;
-    printf("callback hit");
-    fflush(stdout);
     for (i = 0; i < len; i++){
         //printf("pValue test: %u \n \n", *(pValue + i));
         if(i<4){
@@ -107,10 +106,10 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
             scheduleTimeArray[i] = *(pValue + i);
         }
         
-        printf("Array test: %u \n", scheduleTimeArray[i]);
+        printf("Schedule Array: %u \n", scheduleTimeArray[i]);
     }
     currentRealTimeSec = scheduleTimeArray[len-2]*3600+scheduleTimeArray[len-1]*60;//add back in the *60
-    printf("real time: %u \n", currentRealTimeSec);
+    printf("Current Real Time Seconds: %u \n", currentRealTimeSec);
     fflush(stdout);
 
     //RTC initialization
@@ -129,7 +128,7 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
         scheduledTimeOn = 0;
         scheduledTimeOff = 1;
     }
-    printf("next time index: %u \n", nextTimeIndex);
+    printf("Next Time Index: %u \n", nextTimeIndex);
     printf("In schedule?: %u \n", scheduledTimeOn);
     fflush(stdout);
 
@@ -169,7 +168,7 @@ void scheduleArrayHandler(uint16_t len, uint8_t *pValue)
 void rootDepthHandler( uint8_t *pValue)
 {
     rootDepth = *pValue;
-    printf("root depth: %u", rootDepth);
+    printf("Root Depth: %u \n", rootDepth);
     printf("\n");
     fflush(stdout);
 }
@@ -221,19 +220,20 @@ void loadData(uint8_t *pValue){
     //uint8_t testArray[512];
     switch(*pValue){
         case 1: //Rain Data
-        printf("Case 1: %u", *pValue);
-        printf("\n");
+        printf("Load Rain Data: %u \n", *pValue);
         fflush(stdout);
         
         AttsSetAttr(MCS_DATA_HDL, 64, rainSensorData);
-        for(int x = 0; x<10;x++){
-            printf("Rain Data %u \n", rainSensorData[x]);
-            fflush(stdout);
-        }
+        //for(int x = 0; x<10;x++){
+        //    printf("Rain Data %u \n", rainSensorData[x]);
+        //    fflush(stdout);
+        //}
 
         break;
 
         case 2: //Cap Data
+        printf("Load Moisture Data: %u \n", *pValue);
+        fflush(stdout);
 
         AttsSetAttr(MCS_DATA_HDL, 64, capSensorData);
         

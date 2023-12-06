@@ -55,7 +55,7 @@ void oneshotTimerInit8kTimer5(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pre
     //MXC_TMR_SetCount(timer,0);
 
     //MXC_TMR_ClearFlags(timer);
-    printf("solenoid oneshot initialized\n");
+    printf("Solenoid Oneshot Initialized\n");
     fflush(stdout);
     
 }
@@ -81,8 +81,8 @@ void closeSolenoid()
 void SolenoidOSTHandler(void)
 {
     // Clear 
-    printf("solenoid interrupt");
-    fflush(stdout);
+    //printf("solenoid interrupt");
+    //fflush(stdout);
     MXC_TMR_ClearFlags(SOLENOID_TIMER);
     //MXC_TMR_Shutdown(SOLENOID_TIMER);
 

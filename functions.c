@@ -157,8 +157,8 @@ void continuousTimerInit(mxc_tmr_regs_t *timer, uint32_t ticks, mxc_tmr_pres_t p
         MXC_TMR_Stop(timer);
         //MXC_TMR_SetCount(timer, 0);
         //MXC_TMR_ClearFlags(timer);
-        printf("Stop/Reset timer \n");
-        fflush(stdout);
+        //printf("Stop/Reset timer \n");
+        //fflush(stdout);
     }
 
     return;
@@ -275,7 +275,7 @@ void moistureStartMeasurement(){
             MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_22);
         }
     }
-    else if(rootDepth < 4){
+    else if(rootDepth > 4){
             MXC_GPIO_OutSet(MXC_GPIO0,  MXC_GPIO_PIN_21);
             MXC_Delay(500000);
             adcval = MXC_ADC_StartConversion(MOISTURE_READ_1);//*(1.22/1024);
@@ -302,10 +302,6 @@ void moistureStartMeasurement(){
     //fflush(stdout);
     //capSensorData[moistureCount-1] = (uint8_t)  (adcval >> 2);
 
-
-    //Make sure we are losing the 2 LSB with the typecast and not the 2 MSB
-    //Avg thresholds for low and high moisture?
-    //Stop sampling when variable flipped?
 }
 
 void capEnd(){
@@ -324,7 +320,8 @@ void capEnd(){
         highMoisture = 0;
         lowMoisture = 0;
     }
-
+    printf("Moisture End Avg: %f \n", moistureAvg);
+    fflush(stdout);
     moistureCount = 0;
     moistureSum = 0;
     moistureAvg = 0;
@@ -333,10 +330,8 @@ void capEnd(){
 void rainStartMeasurement(){
     MXC_TMR_ClearFlags(TAKE_SAMPLE_TIMER);
     int adcval;
-    printf("Rain Start Conversion \n");
-    fflush(stdout);
     adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
-    printf("ADC reading %f: \n", adcval*(1.22/1024));
+    printf("Rain reading %f: \n", adcval*(1.22/1024));
     #if 0
     if(rainCount%2 == 0){
         adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
@@ -349,11 +344,11 @@ void rainStartMeasurement(){
     #endif
     //rainSensorData[rainCount] = (uint8_t) (adcval >> 2);
     rainCount++;
-    printf("Rain Count %u: \n", rainCount);
+    //printf("Rain Count %u: \n", rainCount);
     if (adcval < RAIN_VOLTAGE_THRESHOLD){
         rainPeaks++;
-        printf("Peak count %u: \n",rainPeaks);
-        fflush(stdout);
+        //printf("Rain Peak Count %u: \n",rainPeaks);
+        //fflush(stdout);
     }
     //# of rainPeaks needed to flip raining variable?
     //Stop sampling when raining is detected?
@@ -367,11 +362,11 @@ void rainEnd(){
 
     rainSensorData[rainStorageCount] = rainPeaks;
     rainStorageCount++;
-
+    printf("Raining End Peak Count: %u \n", rainSensorData[rainStorageCount-1]);
+    fflush(stdout);
     if(rainPeaks > RAIN_PEAK_THRESHOLD){
         raining = 1;
-        printf("Raining Triggered, latest peak count: %u", rainSensorData[rainStorageCount-1]);
-        fflush(stdout);
+
         //AttsSetAttr(MCS_DATA_HDL, 64, rainSensorData);
 
     }
@@ -404,7 +399,7 @@ void startMoistureSystem(){
     MXC_TMR_Start(PWM_TIMER);
 
     continuousTimerInit(TAKE_SAMPLE_TIMER, 125, TMR_PRES_256, FALSE); //~1s Start of continuous ~ 125
-    printf("Start Moisture");
+    printf("Moisture Start Sampling \n");
     fflush(stdout);
     //capOn = 0;
 
@@ -413,7 +408,7 @@ void startMoistureSystem(){
 void startRainSystem(){  
     MXC_GPIO_OutSet(MXC_GPIO2,  MXC_GPIO_PIN_6);
 
-    printf("Start Rain \n");
+    printf("Start Rain Sampling \n");
     fflush(stdout);
 
     MXC_NVIC_SetVector(TMR1_IRQn, rainStartMeasurement);
@@ -424,7 +419,7 @@ void startRainSystem(){
 }
 
 int chargeBattery(){
-    printf("Battery Charging");
+    printf("Battery Charging \n");
     fflush(stdout);
     openSolenoid();
     MXC_Delay(60000000);
@@ -436,9 +431,8 @@ int chargeBattery(){
 void scheduleRTCHandler(){
     uint32_t time = 0;
     MXC_RTC_ClearFlags(MXC_RTC_GetFlags());
-    printf("RTC Handler Hit \n");
     MXC_RTC_GetSeconds(&time);
-    printf("second count %u \n", time);
+    printf("RTC Schedule Change Second Count: %u \n", time);
     fflush(stdout);
 
     if(nextTimeIndex==3){
@@ -457,8 +451,8 @@ void scheduleRTCHandler(){
         scheduledTimeOff = 1;
     }
 
-    printf("next time index: %u \n", nextTimeIndex);
-    printf("In schedule?: %u \n", scheduledTimeOn);
+    printf("Next Time Index: %u \n", nextTimeIndex);
+    printf("In Scheduled Watering Time?: %u \n", scheduledTimeOn);
     fflush(stdout);
 
 
@@ -487,7 +481,8 @@ void storeStateChange(){
     hour = time/5;
     minute = time%5;
 
-    printf("Hour: %u \n Minute: %u", hour, minute);
+    printf("Store State Change Hour: %u \n", hour);
+    printf("Minute: %u \n", minute);
     fflush(stdout);
     stateData[stateDataCount] = hour;
     stateDataCount++;
@@ -500,12 +495,18 @@ void storeStateChange(){
     return;
 }
 
+void resetDecisionVariables(){
+    manualOn = 0;
+    manualOff = 0;
+    raining = 0;
+    highMoisture = 0;
+    lowMoisture = 0;
+}
 
 
 
-
-TRUE;
-FALSE;
+//TRUE;
+//FALSE;
 
 int offLoop(){
     while(1){
