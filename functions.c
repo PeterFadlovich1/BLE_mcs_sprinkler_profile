@@ -41,7 +41,7 @@
 #define RAIN_PEAK_THRESHOLD 3
 
 #define LOW_MOISTURE_THRESHOLD 754 
-#define HIGH_MOISTURE_THRESHOLD 511
+#define HIGH_MOISTURE_THRESHOLD 300
 
 
 
@@ -275,7 +275,7 @@ void moistureStartMeasurement(){
             MXC_GPIO_OutClr(MXC_GPIO0,  MXC_GPIO_PIN_22);
         }
     }
-    else if(rootDepth > 4){
+    else if(rootDepth < 4){
             MXC_GPIO_OutSet(MXC_GPIO0,  MXC_GPIO_PIN_21);
             MXC_Delay(500000);
             adcval = MXC_ADC_StartConversion(MOISTURE_READ_1);//*(1.22/1024);
@@ -295,8 +295,10 @@ void moistureStartMeasurement(){
 
 
     moistureCount++;
-    moistureSum+=adcval;
-    moistureAvg = moistureSum/moistureCount;
+    moistureSum = moistureSum + adcval;
+    printf("Moisture Sum: %u \n", moistureSum);
+    fflush(stdout);
+    //moistureAvg = moistureSum/moistureCount;
 
     //printf("ADC moisture type cast to 8 bit %u: \n", (uint8_t) adcval);
     //fflush(stdout);
@@ -305,8 +307,14 @@ void moistureStartMeasurement(){
 }
 
 void capEnd(){
-    capSensorData[capStorageCount] = (uint8_t)  (moistureAvg / 4);
+    moistureAvg = moistureSum/moistureCount;
+    printf("Moisture End Avg: %u \n", moistureAvg);
+    printf("Moisture End Avg/4: %u \n", moistureAvg/4);
+    printf("Moisture Sum: %u \n", moistureSum);
+    fflush(stdout);
+    capSensorData[capStorageCount] = moistureAvg/4;
     capStorageCount++;
+
 
     if (moistureAvg > LOW_MOISTURE_THRESHOLD){
         highMoisture = 0;
@@ -320,8 +328,7 @@ void capEnd(){
         highMoisture = 0;
         lowMoisture = 0;
     }
-    printf("Moisture End Avg: %f \n", moistureAvg);
-    fflush(stdout);
+
     moistureCount = 0;
     moistureSum = 0;
     moistureAvg = 0;
@@ -330,18 +337,16 @@ void capEnd(){
 void rainStartMeasurement(){
     MXC_TMR_ClearFlags(TAKE_SAMPLE_TIMER);
     int adcval;
-    adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
-    printf("Rain reading %f: \n", adcval*(1.22/1024));
-    #if 0
+    //adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
+    //printf("Rain reading %f: \n", adcval*(1.22/1024));
     if(rainCount%2 == 0){
         adcval = MXC_ADC_StartConversion(RAIN_READ_1);//*(1.22/1024);
-        printf("ADC reading %f: \n", adcval*(1.22/1024));
+        printf("Rain reading 1 %f: \n", adcval*(1.22/1024));
     }
     else{
         adcval = MXC_ADC_StartConversion(RAIN_READ_2);//*(1.22/1024);
-        printf("ADC reading %f: \n", adcval*(1.22/1024));
+        printf("Rain reading 2 %f: \n", adcval*(1.22/1024));
     }
-    #endif
     //rainSensorData[rainCount] = (uint8_t) (adcval >> 2);
     rainCount++;
     //printf("Rain Count %u: \n", rainCount);
@@ -516,10 +521,13 @@ int offLoop(){
         else if(manualOn){
             break;
         }
-        else if(scheduledTimeOn && !manualOff && !raining && !highMoisture){
+        else if (manualOff){
+            continue;
+        }
+        else if(scheduledTimeOn && !raining && !highMoisture){
             break;
         }
-        else if(lowMoisture && !manualOff && !raining){
+        else if(lowMoisture && !raining){
             break;
         }
     }

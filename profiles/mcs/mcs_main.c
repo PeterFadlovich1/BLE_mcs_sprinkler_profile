@@ -183,8 +183,8 @@ uint8_t McsWriteCback(dmConnId_t connId, uint16_t handle, uint8_t operation, uin
         break;
     case MCS_DATA_HDL:
         //printf("shoutout \n");
-        //printf("Pvalue: %u \n", (uint8_t *)pValue);
-        //fflush(stdout);
+        printf("Pvalue: %u \n", (uint8_t *)pValue);
+        fflush(stdout);
         //requestData();
         loadData(pValue);
 
