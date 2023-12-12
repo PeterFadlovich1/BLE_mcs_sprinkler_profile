@@ -308,14 +308,7 @@ void moistureStartMeasurement(){
 
 void capEnd(){
     moistureAvg = moistureSum/moistureCount;
-    printf("Moisture End Avg: %u \n", moistureAvg);
-    printf("Moisture End Avg/4: %u \n", moistureAvg/4);
-    printf("Moisture Sum: %u \n", moistureSum);
-    fflush(stdout);
-    capSensorData[capStorageCount] = moistureAvg/4;
-    capStorageCount++;
-
-
+    
     if (moistureAvg > LOW_MOISTURE_THRESHOLD){
         highMoisture = 0;
         lowMoisture = 1;
@@ -328,6 +321,13 @@ void capEnd(){
         highMoisture = 0;
         lowMoisture = 0;
     }
+
+    printf("Moisture End Avg: %u \n", moistureAvg);
+    printf("Moisture End Avg/4: %u \n", moistureAvg/4);
+    printf("Moisture Sum: %u \n", moistureSum);
+    fflush(stdout);
+    capSensorData[capStorageCount] = moistureAvg/4;
+    capStorageCount++;
 
     moistureCount = 0;
     moistureSum = 0;
@@ -481,10 +481,10 @@ void storeStateChange(){
     MXC_RTC_GetSeconds(&time);
     uint8_t hour, minute;
 
-    //hour = (time/3600)%24;
-    //minute = (time%3600)/60;
-    hour = time/5;
-    minute = time%5;
+    hour = (time/3600)%24;
+    minute = (time%3600)/60;
+    //hour = time/5;
+    //minute = time%5;
 
     printf("Store State Change Hour: %u \n", hour);
     printf("Minute: %u \n", minute);
